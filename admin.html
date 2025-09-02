@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>백령감리교회 주보 관리자</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Malgun Gothic', '맑은 고딕', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            border-left: 5px solid #667eea;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::before {
+            content: '⚙️';
+            margin-right: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #495057;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        .worship-items {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .worship-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr auto;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .worship-item input[type="text"] {
+            padding: 8px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+
+        .worship-item input[type="checkbox"] {
+            width: auto;
+        }
+
+        .remove-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .add-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .financial-items {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .financial-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .news-items {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .news-item {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            display: block;
+            margin: 30px auto;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .preview-btn {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 15px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .preview-btn:hover {
+            background: #138496;
+            text-decoration: none;
+            color: white;
+        }
+
+        .button-group {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .form-row,
+            .form-row-3 {
+                grid-template-columns: 1fr;
+            }
+            
+            .worship-item,
+            .financial-item,
+            .news-item {
+                grid-template-columns: 1fr;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>백령감리교회 주보 관리자</h1>
+            <p>주보 내용을 수정하고 관리하세요</p>
+        </div>
+
+        <div class="content">
+            <div class="success-message" id="successMessage">
+                ✅ 변경사항이 성공적으로 저장되었습니다!
+            </div>
+
+            <form id="bulletinForm">
+                <!-- 기본 정보 -->
+                <div class="section">
+                    <h2 class="section-title">기본 정보</h2>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="churchName">교회명</label>
+                            <input type="text" id="churchName" name="churchName" value="백령감리교회">
+                        </div>
+                        <div class="form-group">
+                            <label for="churchSubtitle">교회 부제목</label>
+                            <input type="text" id="churchSubtitle" name="churchSubtitle" value="기독교 대한감리회 • METHODIST CHURCH BAENGNYEONG">
+                        </div>
+                    </div>
+                    <div class="form-row-3">
+                        <div class="form-group">
+                            <label for="volume">권수</label>
+                            <input type="text" id="volume" name="volume" value="제2권 32호">
+                        </div>
+                        <div class="form-group">
+                            <label for="date">날짜</label>
+                            <input type="text" id="date" name="date" value="2025년 8월 31일">
+                        </div>
+                        <div class="form-group">
+                            <label for="pastor">담임목사</label>
+                            <input type="text" id="pastor" name="pastor" value="정재화">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 예배 정보 -->
+                <div class="section">
+                    <h2 class="section-title">예배 정보</h2>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="worshipTime">예배 시간</label>
+                            <input type="text" id="worshipTime" name="worshipTime" value="오전 11시">
+                        </div>
+                        <div class="form-group">
+                            <label for="worshipLeader">인도자</label>
+                            <input type="text" id="worshipLeader" name="worshipLeader" value="정재화 목사">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="scripture">성경봉독</label>
+                            <input type="text" id="scripture" name="scripture" value="요한복음 10장 10절">
+                        </div>
+                        <div class="form-group">
+                            <label for="sermon">설교 제목</label>
+                            <input type="text" id="sermon" name="sermon" value="진정한 복이란?">
+                        </div>
+                    </div>
+                    
+                    <label>예배 순서</label>
+                    <div class="worship-items" id="worshipItems">
+                        <!-- 예배 순서 항목들이 여기에 동적으로 추가됩니다 -->
+                    </div>
+                    <button type="button" class="add-btn" onclick="addWorshipItem()">예배 순서 추가</button>
+                </div>
+
+                <!-- 헌금 내역 -->
+                <div class="section">
+                    <h2 class="section-title">헌금 내역</h2>
+                    <div class="form-group">
+                        <label for="financialMonth">헌금 월</label>
+                        <input type="text" id="financialMonth" name="financialMonth" value="8월">
+                    </div>
+                    
+                    <label>헌금 항목</label>
+                    <div class="financial-items" id="financialItems">
+                        <!-- 헌금 항목들이 여기에 동적으로 추가됩니다 -->
+                    </div>
+                    <button type="button" class="add-btn" onclick="addFinancialItem()">헌금 항목 추가</button>
+                    
+                    <div class="form-group">
+                        <label for="bankAccount">헌금 계좌</label>
+                        <input type="text" id="bankAccount" name="bankAccount" value="농협 351-1328-3733-53 (기독교대한감리회 백령교회)">
+                    </div>
+                </div>
+
+                <!-- 교회 소식 -->
+                <div class="section">
+                    <h2 class="section-title">교회 소식</h2>
+                    <div class="news-items" id="newsItems">
+                        <!-- 교회 소식 항목들이 여기에 동적으로 추가됩니다 -->
+                    </div>
+                    <button type="button" class="add-btn" onclick="addNewsItem()">소식 추가</button>
+                </div>
+
+                <!-- 연락처 정보 -->
+                <div class="section">
+                    <h2 class="section-title">연락처 정보</h2>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="address">주소</label>
+                            <input type="text" id="address" name="address" value="인천광역시 옹진군 백령면 진촌리 311-3">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">전화번호</label>
+                            <input type="text" id="phone" name="phone" value="032) 836-7401">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="mobile">휴대폰</label>
+                            <input type="text" id="mobile" name="mobile" value="010-4804-3124">
+                        </div>
+                        <div class="form-group">
+                            <label for="established">설립일</label>
+                            <input type="text" id="established" name="established" value="2024년 10월 15일">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <a href="index.html" class="preview-btn" target="_blank">미리보기</a>
+                    <button type="submit" class="save-btn">변경사항 저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 초기 데이터
+        const initialWorshipItems = [
+            { item: "경배와 찬양", leader: "다함께", standing: false },
+            { item: "조용한 기도 (예배로 초대)", leader: "인도자", standing: false },
+            { item: "찬송 80장", leader: "다함께", standing: true },
+            { item: "성시교독 74편", leader: "다함께", standing: true },
+            { item: "신앙고백", leader: "다함께", standing: true },
+            { item: "찬송 427장", leader: "다함께", standing: false },
+            { item: "목회기도", leader: "인도자", standing: false },
+            { item: "교회소식 (주보와 화면)", leader: "인도자", standing: false },
+            { item: "봉헌기도", leader: "인도자", standing: false },
+            { item: "성찬 (주님의 식탁으로 초대)", leader: "인도자", standing: true },
+            { item: "성경봉독 - 요한복음 10장 10절", leader: "다함께", standing: false },
+            { item: "설교 - 진정한 복이란?", leader: "인도자", standing: false },
+            { item: "결단의 기도 (공동기도)", leader: "다함께", standing: true },
+            { item: "파송의 찬양 - 십자가 군병들아", leader: "다함께", standing: true },
+            { item: "축도", leader: "인도자", standing: false }
+        ];
+
+        const initialFinancialItems = [
+            { name: "주일헌금", amount: "105,000원" },
+            { name: "십일조", amount: "860,000원" },
+            { name: "감사헌금", amount: "785,000원" },
+            { name: "비전교회 후원금", amount: "1,181,000원" },
+            { name: "특별헌금", amount: "1,000,000원" }
+        ];
+
+        const initialNewsItems = [
+            "🙏 오늘 처음 나오신 분들을 주님의 이름으로 환영합니다.",
+            "📅 9월 1일 인천 내리교회에서 지방목회자 모임이 있어 출도합니다.",
+            "🙏 저희 교회가 목양, 전도, 군선교, 북한선교를 감당할 수 있도록 계속 기도를 드립시다.",
+            "🏠 이번주 수요예배는 집에서 말씀읽기와 기도로 대신합니다.",
+            "🚭 백령도에 금주금연 운동이 일어나도록 기도합시다."
+        ];
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            loadWorshipItems();
+            loadFinancialItems();
+            loadNewsItems();
+        });
+
+        // 예배 순서 로드
+        function loadWorshipItems() {
+            const container = document.getElementById('worshipItems');
+            container.innerHTML = '';
+            
+            initialWorshipItems.forEach((item, index) => {
+                addWorshipItemWithData(item, index);
+            });
+        }
+
+        // 예배 순서 추가 (데이터 포함)
+        function addWorshipItemWithData(data, index) {
+            const container = document.getElementById('worshipItems');
+            const div = document.createElement('div');
+            div.className = 'worship-item';
+            div.innerHTML = `
+                <input type="text" name="worshipItem_${index}" value="${data.item}" placeholder="예배 순서">
+                <input type="text" name="worshipLeader_${index}" value="${data.leader}" placeholder="인도자">
+                <label><input type="checkbox" name="worshipStanding_${index}" ${data.standing ? 'checked' : ''}> 기립</label>
+                <button type="button" class="remove-btn" onclick="removeWorshipItem(this)">삭제</button>
+            `;
+            container.appendChild(div);
+        }
+
+        // 예배 순서 추가 (빈 항목)
+        function addWorshipItem() {
+            const container = document.getElementById('worshipItems');
+            const index = container.children.length;
+            const div = document.createElement('div');
+            div.className = 'worship-item';
+            div.innerHTML = `
+                <input type="text" name="worshipItem_${index}" placeholder="예배 순서">
+                <input type="text" name="worshipLeader_${index}" placeholder="인도자">
+                <label><input type="checkbox" name="worshipStanding_${index}"> 기립</label>
+                <button type="button" class="remove-btn" onclick="removeWorshipItem(this)">삭제</button>
+            `;
+            container.appendChild(div);
+        }
+
+        // 예배 순서 삭제
+        function removeWorshipItem(button) {
+            button.parentElement.remove();
+        }
+
+        // 헌금 항목 로드
+        function loadFinancialItems() {
+            const container = document.getElementById('financialItems');
+            container.innerHTML = '';
+            
+            initialFinancialItems.forEach((item, index) => {
+                addFinancialItemWithData(item, index);
+            });
+        }
+
+        // 헌금 항목 추가 (데이터 포함)
+        function addFinancialItemWithData(data, index) {
+            const container = document.getElementById('financialItems');
+            const div = document.createElement('div');
+            div.className = 'financial-item';
+            div.innerHTML = `
+                <input type="text" name="financialName_${index}" value="${data.name}" placeholder="헌금 항목">
+                <input type="text" name="financialAmount_${index}" value="${data.amount}" placeholder="금액">
+                <button type="button" class="remove-btn" onclick="removeFinancialItem(this)">삭제</button>
+            `;
+            container.appendChild(div);
+        }
+
+        // 헌금 항목 추가 (빈 항목)
+        function addFinancialItem() {
+            const container = document.getElementById('financialItems');
+            const index = container.children.length;
+            const div = document.createElement('div');
+            div.className = 'financial-item';
+            div.innerHTML = `
+                <input type="text" name="financialName_${index}" placeholder="헌금 항목">
+                <input type="text" name="financialAmount_${index}" placeholder="금액">
+                <button type="button" class="remove-btn" onclick="removeFinancialItem(this)">삭제</button>
+            `;
+            container.appendChild(div);
+        }
+
+        // 헌금 항목 삭제
+        function removeFinancialItem(button) {
+            button.parentElement.remove();
+        }
+
+        // 교회 소식 로드
+        function loadNewsItems() {
+            const container = document.getElementById('newsItems');
+            container.innerHTML = '';
+            
+            initialNewsItems.forEach((item, index) => {
+                addNewsItemWithData(item, index);
+            });
+        }
+
+        // 교회 소식 추가 (데이터 포함)
+        function addNewsItemWithData(data, index) {
+            const container = document.getElementById('newsItems');
+            const div = document.createElement('div');
+            div.className = 'news-item';
+            div.innerHTML = `
+                <textarea name="newsItem_${index}" placeholder="교회 소식 내용">${data}</textarea>
+                <button type="button" class="remove-btn" onclick="removeNewsItem(this)">삭제</button>
+            `;
+            container.appendChild(div);
+        }
+
+        // 교회 소식 추가 (빈 항목)
+        function addNewsItem() {
+            const container = document.getElementById('newsItems');
+            const index = container.children.length;
+            const div = document.createElement('div');
+            div.className = 'news-item';
+            div.innerHTML = `
+                <textarea name="newsItem_${index}" placeholder="교회 소식 내용"></textarea>
+                <button type="button" class="remove-btn" onclick="removeNewsItem(this)">삭제</button>
+            `;
+            container.appendChild(div);
+        }
+
+        // 교회 소식 삭제
+        function removeNewsItem(button) {
+            button.parentElement.remove();
+        }
+
+        // 폼 제출 처리
+        document.getElementById('bulletinForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 폼 데이터 수집
+            const formData = new FormData(this);
+            const data = {};
+            
+            // 기본 정보 수집
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+            
+            // 예배 순서 수집
+            data.worshipItems = [];
+            const worshipContainer = document.getElementById('worshipItems');
+            Array.from(worshipContainer.children).forEach((item, index) => {
+                const itemText = item.querySelector(`input[name="worshipItem_${index}"]`).value;
+                const leader = item.querySelector(`input[name="worshipLeader_${index}"]`).value;
+                const standing = item.querySelector(`input[name="worshipStanding_${index}"]`).checked;
+                
+                if (itemText) {
+                    data.worshipItems.push({ item: itemText, leader: leader, standing: standing });
+                }
+            });
+            
+            // 헌금 항목 수집
+            data.financialItems = [];
+            const financialContainer = document.getElementById('financialItems');
+            Array.from(financialContainer.children).forEach((item, index) => {
+                const name = item.querySelector(`input[name="financialName_${index}"]`).value;
+                const amount = item.querySelector(`input[name="financialAmount_${index}"]`).value;
+                
+                if (name && amount) {
+                    data.financialItems.push({ name: name, amount: amount });
+                }
+            });
+            
+            // 교회 소식 수집
+            data.newsItems = [];
+            const newsContainer = document.getElementById('newsItems');
+            Array.from(newsContainer.children).forEach((item, index) => {
+                const content = item.querySelector(`textarea[name="newsItem_${index}"]`).value;
+                
+                if (content) {
+                    data.newsItems.push(content);
+                }
+            });
+            
+            // 로컬 스토리지에 저장
+            localStorage.setItem('bulletinData', JSON.stringify(data));
+            
+            // 성공 메시지 표시
+            const successMessage = document.getElementById('successMessage');
+            successMessage.style.display = 'block';
+            
+            // 3초 후 메시지 숨기기
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 3000);
+            
+            // 페이지 상단으로 스크롤
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

@@ -257,6 +257,76 @@
             font-size: 18px;
         }
 
+        /* Admin login styles */
+        .admin-login {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 2px solid #e9ecef;
+            z-index: 1000;
+            min-width: 200px;
+        }
+
+        .admin-login h4 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .admin-login input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 8px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .admin-login button {
+            width: 100%;
+            padding: 8px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .admin-login button:hover {
+            background: #5a6fd8;
+        }
+
+        .admin-error {
+            color: #dc3545;
+            font-size: 11px;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        .admin-success {
+            color: #28a745;
+            font-size: 11px;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .admin-login {
+                top: 10px;
+                left: 10px;
+                right: 10px;
+                width: auto;
+                min-width: auto;
+            }
+        }
+
         /* Picture placeholder styles */
         .pictures-section {
             background: white;
@@ -280,8 +350,10 @@
         }
 
         .wide-picture {
-            height: 200px;
-            width: 100%;
+            height: 300px;
+            width: 501px;
+            max-width: 100%;
+            margin: 0 auto;
         }
 
         .logo-container {
@@ -315,6 +387,54 @@
         .placeholder-content small {
             font-size: 0.9em;
             opacity: 0.8;
+        }
+
+        /* Image styles */
+        .picture-container {
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .picture-container:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .bulletin-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .wide-image {
+            height: 300px;
+            width: 501px;
+            background: white;
+        }
+
+        .logo-image {
+            height: 150px;
+            object-fit: contain;
+            background: white;
+            padding: 10px;
+        }
+
+        .picture-container.wide-picture {
+            height: 300px;
+            width: 501px;
+            max-width: 100%;
+            margin: 0 auto 20px auto;
+        }
+
+        .picture-container.logo-form {
+            height: 150px;
+            width: 200px;
+            background: white;
+            border: 2px solid #e9ecef;
         }
 
         /* PDF-specific styles for 4-page layout */
@@ -399,6 +519,15 @@
     </style>
 </head>
 <body>
+    <!-- Admin Login Panel -->
+    <div class="admin-login" id="adminLogin">
+        <h4>관리자 로그인</h4>
+        <input type="text" id="adminUsername" placeholder="사용자명" autocomplete="username">
+        <input type="password" id="adminPassword" placeholder="비밀번호" autocomplete="current-password">
+        <button onclick="adminLogin()">로그인</button>
+        <div id="adminMessage"></div>
+    </div>
+
     <button class="download-btn" onclick="downloadPDF()">PDF 다운로드</button>
     
     <div class="container" id="bulletin-content">
@@ -618,29 +747,17 @@
                 <div class="section">
                     <h2 class="section-title">사진 및 로고</h2>
                     
-                    <div class="picture-placeholder wide-picture">
-                        <div class="placeholder-content">
-                            <span class="placeholder-icon">🖼️</span>
-                            <p>첫 번째 사진 (가로형)</p>
-                            <small>이곳에 교회 활동 사진을 추가하세요</small>
-                        </div>
+                    <div class="picture-container wide-picture">
+                        <img src="picture one.png" alt="교회 활동 사진 1" class="bulletin-image wide-image">
                     </div>
                     
-                    <div class="picture-placeholder wide-picture">
-                        <div class="placeholder-content">
-                            <span class="placeholder-icon">🖼️</span>
-                            <p>두 번째 사진 (가로형)</p>
-                            <small>이곳에 교회 활동 사진을 추가하세요</small>
-                        </div>
+                    <div class="picture-container wide-picture">
+                        <img src="picture two.png" alt="교회 활동 사진 2" class="bulletin-image wide-image">
                     </div>
                     
                     <div class="logo-container">
-                        <div class="picture-placeholder logo-form">
-                            <div class="placeholder-content">
-                                <span class="placeholder-icon">🏛️</span>
-                                <p>교회 로고</p>
-                                <small>교회 로고나 상징을 추가하세요</small>
-                            </div>
+                        <div class="picture-container logo-form">
+                            <img src="logo.png" alt="백령감리교회 로고" class="bulletin-image logo-image">
                         </div>
                     </div>
                 </div>
@@ -671,6 +788,225 @@
     </div>
 
     <script>
+        // Load data from localStorage and update the bulletin content
+        function loadBulletinData() {
+            const savedData = localStorage.getItem('bulletinData');
+            if (!savedData) return;
+            
+            const data = JSON.parse(savedData);
+            
+            // Update basic information
+            if (data.churchName) {
+                document.querySelector('.church-name').textContent = data.churchName;
+            }
+            if (data.churchSubtitle) {
+                document.querySelector('.church-subtitle').textContent = data.churchSubtitle;
+            }
+            if (data.volume || data.date || data.pastor) {
+                const dateInfo = document.querySelector('.date-info');
+                dateInfo.textContent = `${data.volume || '제2권 32호'} • ${data.date || '2025년 8월 31일'} • 담임목사 ${data.pastor || '정재화'}`;
+            }
+            
+            // Update worship information
+            if (data.worshipTime || data.worshipLeader) {
+                const worshipHeader = document.querySelector('.worship-order p');
+                worshipHeader.textContent = `${data.worshipTime || '오전 11시'} • 인도자 ${data.worshipLeader || '정재화 목사'}`;
+            }
+            
+            if (data.scripture) {
+                const scriptureElement = document.querySelector('.worship-item:nth-child(11) span:first-child');
+                if (scriptureElement) {
+                    scriptureElement.textContent = `성경봉독 - ${data.scripture}`;
+                }
+            }
+            
+            if (data.sermon) {
+                const sermonElement = document.querySelector('.worship-item:nth-child(12) span:first-child .highlight');
+                if (sermonElement) {
+                    sermonElement.textContent = data.sermon;
+                }
+            }
+            
+            // Update worship items
+            if (data.worshipItems && data.worshipItems.length > 0) {
+                const worshipContainer = document.querySelector('.worship-order');
+                const existingItems = worshipContainer.querySelectorAll('.worship-item');
+                
+                // Remove existing worship items
+                existingItems.forEach(item => item.remove());
+                
+                // Add new worship items
+                data.worshipItems.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = item.standing ? 'worship-item standing' : 'worship-item';
+                    
+                    const itemText = item.item.includes(data.sermon) ? 
+                        item.item.replace(data.sermon, `<span class="highlight">${data.sermon}</span>`) : 
+                        item.item;
+                    
+                    div.innerHTML = `
+                        <span>${itemText}</span>
+                        <span>${item.leader}</span>
+                    `;
+                    
+                    // Insert before the offering notice
+                    const offeringNotice = worshipContainer.querySelector('p[style*="background: #fff3cd"]');
+                    worshipContainer.insertBefore(div, offeringNotice);
+                });
+            }
+            
+            // Update financial information
+            if (data.financialMonth) {
+                const financialTitle = document.querySelector('.section:nth-of-type(3) .section-title');
+                if (financialTitle) {
+                    financialTitle.textContent = `${data.financialMonth} 헌금 내역`;
+                }
+            }
+            
+            if (data.financialItems && data.financialItems.length > 0) {
+                const financialGrid = document.querySelector('.financial-grid');
+                const existingItems = financialGrid.querySelectorAll('.financial-item:not([style*="border: 3px solid"])');
+                
+                // Remove existing financial items (except total)
+                existingItems.forEach(item => item.remove());
+                
+                let total = 0;
+                
+                // Add new financial items
+                data.financialItems.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'financial-item';
+                    div.innerHTML = `
+                        <div>${item.name}</div>
+                        <div class="financial-amount">${item.amount}</div>
+                    `;
+                    
+                    // Calculate total (remove non-numeric characters and convert to number)
+                    const amount = parseInt(item.amount.replace(/[^0-9]/g, '')) || 0;
+                    total += amount;
+                    
+                    // Insert before the total item
+                    const totalItem = financialGrid.querySelector('.financial-item[style*="border: 3px solid"]');
+                    financialGrid.insertBefore(div, totalItem);
+                });
+                
+                // Update total
+                const totalItem = financialGrid.querySelector('.financial-item[style*="border: 3px solid"] .financial-amount');
+                if (totalItem) {
+                    totalItem.textContent = total.toLocaleString() + '원';
+                }
+            }
+            
+            if (data.bankAccount) {
+                const bankAccountElement = document.querySelector('.section:nth-of-type(3) p strong');
+                if (bankAccountElement && bankAccountElement.parentElement) {
+                    bankAccountElement.parentElement.innerHTML = `<strong>헌금계좌:</strong> ${data.bankAccount}`;
+                }
+            }
+            
+            // Update church news
+            if (data.newsItems && data.newsItems.length > 0) {
+                const newsList = document.querySelector('.section:nth-of-type(4) ul');
+                if (newsList) {
+                    newsList.innerHTML = '';
+                    
+                    data.newsItems.forEach(news => {
+                        const li = document.createElement('li');
+                        li.style.cssText = 'margin-bottom: 15px; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #667eea;';
+                        li.textContent = news;
+                        newsList.appendChild(li);
+                    });
+                }
+            }
+            
+            // Update contact information
+            if (data.address) {
+                const addressElement = document.querySelector('.contact-grid .contact-item:nth-child(1) p');
+                if (addressElement) {
+                    addressElement.textContent = data.address;
+                }
+            }
+            
+            if (data.phone) {
+                const phoneElement = document.querySelector('.contact-grid .contact-item:nth-child(2) p');
+                if (phoneElement) {
+                    phoneElement.textContent = `☎ ${data.phone}`;
+                }
+            }
+            
+            if (data.mobile) {
+                const mobileElement = document.querySelector('.contact-grid .contact-item:nth-child(3) p');
+                if (mobileElement) {
+                    mobileElement.textContent = `📱 ${data.mobile}`;
+                }
+            }
+            
+            if (data.established) {
+                const establishedElement = document.querySelector('.contact-grid .contact-item:nth-child(4) p');
+                if (establishedElement) {
+                    establishedElement.textContent = data.established;
+                }
+            }
+        }
+        
+        // Admin login function
+        function adminLogin() {
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+            const messageDiv = document.getElementById('adminMessage');
+            
+            // Clear previous messages
+            messageDiv.innerHTML = '';
+            messageDiv.className = '';
+            
+            // Check credentials
+            if (username === 'admin' && password === 'church1234') {
+                messageDiv.innerHTML = '로그인 성공! 관리자 페이지로 이동합니다...';
+                messageDiv.className = 'admin-success';
+                
+                // Redirect to admin page after 1 second
+                setTimeout(() => {
+                    window.open('admin.html', '_blank');
+                    // Clear the form
+                    document.getElementById('adminUsername').value = '';
+                    document.getElementById('adminPassword').value = '';
+                    messageDiv.innerHTML = '';
+                }, 1000);
+            } else {
+                messageDiv.innerHTML = '잘못된 사용자명 또는 비밀번호입니다.';
+                messageDiv.className = 'admin-error';
+                
+                // Clear error message after 3 seconds
+                setTimeout(() => {
+                    messageDiv.innerHTML = '';
+                    messageDiv.className = '';
+                }, 3000);
+            }
+        }
+        
+        // Allow Enter key to submit login
+        document.addEventListener('DOMContentLoaded', function() {
+            const usernameInput = document.getElementById('adminUsername');
+            const passwordInput = document.getElementById('adminPassword');
+            
+            usernameInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    adminLogin();
+                }
+            });
+            
+            passwordInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    adminLogin();
+                }
+            });
+        });
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBulletinData();
+        });
+
         function downloadPDF() {
             const element = document.getElementById('bulletin-content');
             const button = document.querySelector('.download-btn');
@@ -685,9 +1021,21 @@
             element.style.boxShadow = 'none';
             element.style.borderRadius = '0';
             
+            // Get current date for filename
+            const savedData = localStorage.getItem('bulletinData');
+            let filename = '백령감리교회_주보_2025년8월31일.pdf';
+            
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                if (data.date) {
+                    const dateForFilename = data.date.replace(/\s/g, '');
+                    filename = `백령감리교회_주보_${dateForFilename}.pdf`;
+                }
+            }
+            
             const opt = {
                 margin: [0.5, 0.5, 0.5, 0.5],
-                filename: '백령감리교회_주보_2025년8월31일.pdf',
+                filename: filename,
                 image: { 
                     type: 'jpeg', 
                     quality: 0.98 
