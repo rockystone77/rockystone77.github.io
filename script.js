@@ -940,9 +940,9 @@ async function testSingleImage() {
     }
 }
 
-// Enhanced Word document generation with proper formatting and images
+// Enhanced Word document generation with landscape, two-column layout, and 2-page limit
 async function downloadWord() {
-    console.log('🚀 Starting Word document generation...');
+    console.log('🚀 Starting Word document generation with landscape two-column layout...');
     
     const regularContent = document.getElementById('bulletin-content');
     const pdfLayout = document.getElementById('pdf-layout');
@@ -966,37 +966,14 @@ async function downloadWord() {
         // Update PDF layout with current data
         updatePDFLayout();
         
-        // Add images to layout for Word document
-        console.log('📸 Adding images for Word document...');
-        await addImagesToPDFLayout();
+        // Limit content to fit in 2 pages maximum
+        const savedData = localStorage.getItem('bulletinData');
+        let data = {};
+        if (savedData) {
+            data = JSON.parse(savedData);
+        }
         
-        // Wait for images to load
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Convert images to base64 for embedding in Word document
-        const images = pdfLayout.querySelectorAll('img');
-        const imagePromises = Array.from(images).map(async (img) => {
-            try {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = img.naturalWidth || img.width;
-                canvas.height = img.naturalHeight || img.height;
-                
-                // For Word documents, we can try canvas conversion since it's not going through html2pdf
-                ctx.drawImage(img, 0, 0);
-                const base64 = canvas.toDataURL('image/png');
-                img.src = base64;
-                console.log(`✅ Converted image to base64 for Word: ${img.alt}`);
-                return true;
-            } catch (error) {
-                console.warn(`⚠️ Could not convert image ${img.alt}:`, error);
-                return false;
-            }
-        });
-        
-        await Promise.all(imagePromises);
-        
-        // Create enhanced Word document content with proper formatting
+        // Create enhanced Word document content with landscape two-column layout matching reference image
         const wordContent = `
             <html xmlns:o='urn:schemas-microsoft-com:office:office' 
                   xmlns:w='urn:schemas-microsoft-com:office:word' 
@@ -1008,135 +985,391 @@ async function downloadWord() {
                 <xml>
                     <w:WordDocument>
                         <w:View>Print</w:View>
-                        <w:Zoom>90</w:Zoom>
+                        <w:Zoom>100</w:Zoom>
                         <w:DoNotPromptForConvert/>
                         <w:DoNotShowInsertionsAndDeletions/>
+                        <w:DisplayHorizontalDrawingGridEvery>0</w:DisplayHorizontalDrawingGridEvery>
+                        <w:DisplayVerticalDrawingGridEvery>2</w:DisplayVerticalDrawingGridEvery>
+                        <w:UseMarginsForDrawingGridOrigin/>
+                        <w:ValidateAgainstSchemas/>
+                        <w:SaveIfXMLInvalid>false</w:SaveIfXMLInvalid>
+                        <w:IgnoreMixedContent>false</w:IgnoreMixedContent>
+                        <w:AlwaysShowPlaceholderText>false</w:AlwaysShowPlaceholderText>
+                        <w:BrowserLevel>MicrosoftInternetExplorer4</w:BrowserLevel>
                     </w:WordDocument>
                 </xml>
                 <![endif]-->
                 <style>
-                    @page {
+                    /* Page setup for landscape A4 with two columns */
+                    @page Section1 {
                         size: A4 landscape;
-                        margin: 0.5in;
+                        margin: 0.7in 0.5in 0.7in 0.5in;
                         mso-page-orientation: landscape;
+                        mso-header-margin: 0.5in;
+                        mso-footer-margin: 0.5in;
+                        mso-paper-source: 0;
+                        mso-columns: 2;
+                        mso-column-gap: 0.5in;
+                        mso-column-rule: none;
+                    }
+                    
+                    div.Section1 {
+                        page: Section1;
+                        mso-columns: 2;
+                        mso-column-gap: 0.5in;
+                        column-count: 2;
+                        column-gap: 0.5in;
+                        column-fill: balance;
                     }
                     
                     body {
-                        font-family: '맑은 고딕', 'Malgun Gothic', Arial, sans-serif;
-                        font-size: 11pt;
-                        line-height: 1.2;
+                        font-family: '맑은 고딕', 'Malgun Gothic', 'Arial', sans-serif;
+                        font-size: 10pt;
+                        line-height: 1.1;
                         margin: 0;
-                        padding: 10px;
+                        padding: 0;
                         background-color: #f5f5dc;
+                        color: #000;
                         mso-line-height-rule: exactly;
+                        mso-pagination: widow-orphan;
                     }
                     
-                    .pdf-layout { 
-                        display: block !important; 
-                        width: 100%;
-                    }
-                    
-                    .pdf-two-column { 
-                        display: table !important;
-                        width: 100%;
-                        table-layout: fixed;
-                    }
-                    
-                    .pdf-left-column, .pdf-right-column { 
-                        display: table-cell !important;
-                        width: 50%;
-                        vertical-align: top;
-                        padding: 0 10px;
-                    }
-                    
-                    .pdf-header { 
-                        background: #c8c8c8; 
-                        padding: 8px; 
-                        text-align: center; 
-                        margin-bottom: 10px;
+                    /* Header styling matching reference image */
+                    .bulletin-header {
+                        text-align: center;
+                        background-color: #d3d3d3;
+                        padding: 8px;
+                        margin-bottom: 15px;
                         border: 1px solid #999;
+                        font-weight: bold;
+                        font-size: 12pt;
+                        color: #000080;
+                        column-span: all;
+                        -webkit-column-span: all;
+                    }
+                    
+                    /* Worship order section */
+                    .worship-section {
+                        margin-bottom: 20px;
+                        break-inside: avoid;
+                        page-break-inside: avoid;
+                    }
+                    
+                    .worship-header {
+                        background-color: #d3d3d3;
+                        padding: 6px;
+                        text-align: center;
+                        font-weight: bold;
+                        font-size: 11pt;
+                        color: #000080;
+                        margin-bottom: 8px;
+                        border: 1px solid #999;
+                    }
+                    
+                    .worship-time-info {
+                        text-align: center;
+                        margin-bottom: 10px;
+                        font-size: 10pt;
                         font-weight: bold;
                     }
                     
-                    .pdf-worship-item { 
-                        display: table !important;
+                    .worship-item {
+                        display: table;
                         width: 100%;
-                        padding: 3px 0; 
+                        margin-bottom: 3px;
+                        font-size: 9pt;
                         border-bottom: 1px dotted #999;
-                        margin-bottom: 2px;
+                        padding: 2px 0;
                     }
                     
-                    .pdf-worship-item span:first-child {
+                    .worship-item-name {
                         display: table-cell;
-                        width: 70%;
+                        width: 65%;
+                        padding-right: 5px;
+                        vertical-align: top;
                     }
                     
-                    .pdf-worship-item span:last-child {
+                    .worship-item-leader {
                         display: table-cell;
-                        width: 30%;
+                        width: 35%;
                         text-align: right;
+                        vertical-align: top;
                     }
                     
-                    .pdf-financial-table { 
-                        width: 100%; 
-                        border-collapse: collapse; 
+                    /* Financial section */
+                    .financial-section {
+                        margin-bottom: 20px;
+                        break-inside: avoid;
+                        page-break-inside: avoid;
+                    }
+                    
+                    .financial-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-size: 8pt;
                         margin: 8px 0;
+                    }
+                    
+                    .financial-table td, .financial-table th {
                         border: 1px solid #666;
-                    }
-                    
-                    .pdf-financial-table td { 
-                        border: 1px solid #666; 
-                        padding: 4px; 
+                        padding: 3px;
                         text-align: center;
-                        font-size: 10pt;
+                        vertical-align: middle;
                     }
                     
-                    .pdf-notice-item { 
-                        margin: 8px 0; 
-                        padding: 6px; 
-                        background: white; 
+                    .financial-table th {
+                        background-color: #e6e6e6;
+                        font-weight: bold;
+                    }
+                    
+                    /* Notice section */
+                    .notice-section {
+                        margin-bottom: 15px;
+                        break-inside: avoid;
+                        page-break-inside: avoid;
+                    }
+                    
+                    .notice-item {
+                        margin: 6px 0;
+                        padding: 5px;
+                        background: white;
                         border: 1px solid #ddd;
                         border-radius: 3px;
+                        font-size: 9pt;
+                        line-height: 1.2;
                     }
                     
-                    .pdf-image-page {
-                        page-break-before: always;
+                    /* Contact info */
+                    .contact-info {
                         text-align: center;
-                        padding: 20px;
-                    }
-                    
-                    .pdf-image-page img {
-                        max-width: 100%;
-                        max-height: 500px;
-                        height: auto;
+                        font-size: 9pt;
+                        margin-top: 15px;
+                        padding: 8px;
+                        background-color: #f0f0f0;
                         border: 1px solid #ccc;
+                        column-span: all;
+                        -webkit-column-span: all;
                     }
                     
-                    .pdf-image-page h2 {
-                        font-size: 16pt;
-                        margin-bottom: 15px;
-                        color: #333;
+                    /* Prevent page breaks in critical sections */
+                    .no-break {
+                        break-inside: avoid;
+                        page-break-inside: avoid;
                     }
                     
-                    h1, h2, h3 {
-                        color: #333;
-                        margin-top: 10px;
-                        margin-bottom: 8px;
+                    /* Ensure content fits in 2 pages maximum */
+                    .page-limit {
+                        max-height: 16in; /* Approximate height for 2 landscape pages */
+                        overflow: hidden;
                     }
                     
-                    p {
-                        margin: 4px 0;
+                    /* Special styling for sermon title */
+                    .sermon-highlight {
+                        color: #ff0000;
+                        font-weight: bold;
                     }
                     
-                    /* Print-specific styles */
-                    @media print {
-                        body { background: white; }
-                        .pdf-layout { background: white; }
+                    /* Blue text styling like in reference */
+                    .blue-text {
+                        color: #000080;
+                        font-weight: bold;
+                    }
+                    
+                    /* Bottom message styling */
+                    .bottom-message {
+                        text-align: center;
+                        font-size: 14pt;
+                        color: #0066cc;
+                        font-weight: bold;
+                        margin-top: 20px;
+                        column-span: all;
+                        -webkit-column-span: all;
                     }
                 </style>
             </head>
             <body>
-                ${pdfLayout.innerHTML}
+                <div class="Section1 page-limit">
+                    <!-- Main Header -->
+                    <div class="bulletin-header">
+                        ★ ★ ★ 주일예배순서 ★ ★ ★
+                    </div>
+                    
+                    <!-- Left Column Content -->
+                    <div class="worship-section no-break">
+                        <div class="worship-time-info">
+                            <strong>오전 11시</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>인도자 ${data.worshipLeader || '정재화 목사'}</strong>
+                        </div>
+                        
+                        <div class="worship-item">
+                            <div class="worship-item-name">경배와 찬양</div>
+                            <div class="worship-item-leader">다함께</div>
+                        </div>
+                        
+                        <div class="worship-item">
+                            <div class="worship-item-name">주용한 기도</div>
+                            <div class="worship-item-leader">인도자</div>
+                        </div>
+                        
+                        <div class="worship-item">
+                            <div class="worship-item-name">※찬&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;송</div>
+                            <div class="worship-item-leader">다함께</div>
+                        </div>
+                        
+                        <div class="worship-item">
+                            <div class="worship-item-name">※성시교독</div>
+                            <div class="worship-item-leader">다함께</div>
+                        </div>
+                        
+                        <div class="worship-item">
+                            <div class="worship-item-name">※신앙고백</div>
+                            <div class="worship-item-leader">다함께</div>
+                        </div>
+                        
+                        <div class="worship-item">
+                            <div class="worship-item-name">찬&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;송</div>
+                            <div class="worship-item-leader">다함께</div>
+                        </div>
+                        
+                        <div class="worship-item">
+                            <div class="worship-item-name">목회기도</div>
+                            <div class="worship-item-leader">인도자</div>
+                        </div>
+                        
+                        <div class="worship-item">
+                            <div class="worship-item-name">교회소식</div>
+                            <div class="worship-item-leader">인도자</div>
+                        </div>
+                        
+                        <div class="worship-item">
+                            <div class="worship-item-name">봉헌기도</div>
+                            <div class="worship-item-leader">인도자</div>
+                        </div>
+                        
+                        <div class="worship-item">
+                            <div class="worship-item-name">※성&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;찬</div>
+                            <div class="worship-item-leader sermon-highlight">---주님의 사랑으로 초대---</div>
+                        </div>
+                        
+                        <div class="worship-item">
+                            <div class="worship-item-name">성경봉독</div>
+                            <div class="worship-item-leader">다함께</div>
+                        </div>
+                        
+                        <div class="worship-item">
+                            <div class="worship-item-name">설&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;교</div>
+                            <div class="worship-item-leader">인도자</div>
+                        </div>
+                        
+                        <div class="worship-item">
+                            <div class="worship-item-name">※결단의 기도</div>
+                            <div class="worship-item-leader">다함께</div>
+                        </div>
+                        
+                        <div class="worship-item">
+                            <div class="worship-item-name">※파송의 찬양</div>
+                            <div class="worship-item-leader">다함께</div>
+                        </div>
+                        
+                        <div class="worship-item">
+                            <div class="worship-item-name">축&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;도</div>
+                            <div class="worship-item-leader">인도자</div>
+                        </div>
+                        
+                        <div style="text-align: center; margin: 15px 0; color: #0066cc; font-weight: bold;">
+                            ✚ 헌금은 돌아오시면서 헌금함에 합니다!
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column Content -->
+                    <div class="worship-section no-break">
+                        <div class="worship-header blue-text">
+                            오후 2시 30분 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ★주일오후예배★
+                        </div>
+                        <div style="text-align: center; margin: 10px 0;">
+                            <strong>찬송</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>다함께</strong><br>
+                            <strong>말씀</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>인도자</strong>
+                        </div>
+                        
+                        <div class="worship-header blue-text">
+                            오후 7:30 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ★수요성경공부★
+                        </div>
+                        <div style="text-align: center; margin: 10px 0;">
+                            <strong>찬송</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>인도자</strong><br>
+                            <strong>말씀</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>인도자</strong>
+                        </div>
+                        
+                        <div class="worship-header blue-text">
+                            오전 5시 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ★새벽기도회★(월~금)
+                        </div>
+                        <div style="text-align: center; margin: 10px 0;">
+                            <strong>말씀</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>인도자</strong>
+                        </div>
+                        
+                        <div class="worship-header blue-text">
+                            오후 8:30 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ★금요기도회★ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>인도자</strong>
+                        </div>
+                        <div style="text-align: center; margin: 10px 0; font-size: 9pt;">
+                            인자야, 내가 너를 이스라엘 족속의 파수꾼으로 세웠으니(겔3:17)
+                        </div>
+                        
+                        <div style="text-align: center; margin: 15px 0; font-weight: bold;">
+                            ☩ 8월 헌금 내역 ☩
+                        </div>
+                        
+                        <!-- Financial Table -->
+                        <div class="financial-section no-break">
+                            <table class="financial-table">
+                                <tr style="background-color: #e6e6e6;">
+                                    <td rowspan="5" style="background-color: #add8e6; font-weight: bold; writing-mode: vertical-lr; text-orientation: mixed;">예배시간</td>
+                                    <td><strong>주일예배</strong></td>
+                                    <td><strong>오전 11시</strong></td>
+                                    <td><strong>주일헌금</strong></td>
+                                    <td><strong>105,000</strong></td>
+                                </tr>
+                                <tr>
+                                    <td>주일오후예배</td>
+                                    <td>오후 2시 30</td>
+                                    <td>십일조</td>
+                                    <td>860,000</td>
+                                </tr>
+                                <tr>
+                                    <td>수요성경공부</td>
+                                    <td>오후 7:30</td>
+                                    <td>감사헌금</td>
+                                    <td>785,000</td>
+                                </tr>
+                                <tr>
+                                    <td>금요철야기도회</td>
+                                    <td>오후 8:30</td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>새벽기도회</td>
+                                    <td>오전 5:00</td>
+                                    <td><strong>비전교회 후원금</strong></td>
+                                    <td><strong>1,181,000</strong></td>
+                                </tr>
+                                <tr style="background-color: #add8e6;">
+                                    <td rowspan="2" style="background-color: #add8e6; font-weight: bold; writing-mode: vertical-lr; text-orientation: mixed;">헌금계좌</td>
+                                    <td colspan="2">농협 351-1328-3733-53</td>
+                                    <td>특별헌금</td>
+                                    <td>1,000,000</td>
+                                </tr>
+                                <tr style="background-color: #add8e6;">
+                                    <td colspan="2">기독교대한감리회 백령교회</td>
+                                    <td><strong>합계</strong></td>
+                                    <td><strong>3,931,000</strong></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Bottom Message -->
+                    <div class="bottom-message">
+                        하나님은 당신을 사랑하십니다
+                    </div>
+                </div>
             </body>
             </html>
         `;
@@ -1149,14 +1382,14 @@ async function downloadWord() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = '백령감리교회_주보_완전판.doc';
+        a.download = '백령감리교회_주보_가로형_2단.doc';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
         
-        console.log('✅ Enhanced Word document generated successfully with images and proper formatting');
-        alert('📄 Word 문서가 성공적으로 생성되었습니다!\n\n✅ 이미지 포함\n✅ 향상된 서식\n✅ 인쇄 최적화');
+        console.log('✅ Landscape two-column Word document generated successfully');
+        alert('📄 Word 문서가 성공적으로 생성되었습니다!\n\n✅ 가로형 레이아웃\n✅ 2단 구성\n✅ 2페이지 최대\n✅ 참조 이미지와 동일한 형식');
         
     } catch (error) {
         console.error('❌ Error generating Word document:', error);
