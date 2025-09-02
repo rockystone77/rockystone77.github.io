@@ -350,7 +350,7 @@ function updatePDFLayout() {
     }
 }
 
-// Enhanced PDF download function with better error handling
+// PDF download function with traditional bulletin formatting style
 async function downloadPDF() {
     const regularContent = document.getElementById('bulletin-content');
     const pdfLayout = document.getElementById('pdf-layout');
@@ -363,14 +363,14 @@ async function downloadPDF() {
         return;
     }
     
-    console.log('Starting PDF generation...');
+    console.log('Starting traditional bulletin PDF generation...');
     
     try {
         // Hide UI elements that shouldn't appear in PDF
         buttons.style.display = 'none';
         if (adminLogin) adminLogin.style.display = 'none';
         
-        // Hide regular content and show PDF layout with enhanced visibility
+        // Hide regular content and show PDF layout (traditional bulletin style)
         regularContent.style.display = 'none';
         pdfLayout.style.display = 'block';
         pdfLayout.style.visibility = 'visible';
@@ -382,108 +382,93 @@ async function downloadPDF() {
         // Update PDF layout with current data
         updatePDFLayout();
         
-        // Add images to PDF layout with better error handling
-        await addImagesToPDFLayout();
+        // Wait for layout to settle
+        await new Promise(resolve => setTimeout(resolve, 1000));
         
-        // Wait longer for layout to fully render and images to load
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        console.log('Generating PDF with traditional bulletin formatting...');
         
-        console.log('Generating PDF with html2pdf...');
-        
-        // Enhanced PDF generation options with better CORS handling
+        // PDF generation options optimized for traditional bulletin style
         const opt = {
             margin: [10, 10, 10, 10],
-            filename: '백령감리교회_주보_with_images.pdf',
+            filename: '새 주보.pdf',
             image: { 
-                type: 'jpeg', 
-                quality: 0.95 
+                type: 'png', 
+                quality: 0.85 
             },
             html2canvas: { 
-                scale: 1.5,
-                useCORS: false,  // Disable CORS to avoid tainting issues with local images
-                allowTaint: true,  // Allow tainted canvas for local images
+                scale: 1.2,  // Good quality for traditional layout
+                useCORS: false,
+                allowTaint: true,
+                dpi: 300,
                 letterRendering: true,
-                backgroundColor: '#f5f5dc',
-                logging: false,  // Reduce console noise
-                width: pdfLayout.scrollWidth,
-                height: pdfLayout.scrollHeight,
-                scrollX: 0,
-                scrollY: 0,
-                foreignObjectRendering: false,  // Disable for better compatibility
+                backgroundColor: '#f5f5dc',  // Beige background like the image
+                logging: false,
+                removeContainer: true,
                 ignoreElements: function(element) {
-                    // Ignore elements that shouldn't be in PDF
+                    // Ignore problematic elements but keep PDF layout
                     return element.classList.contains('download-buttons') || 
-                           element.classList.contains('admin-login');
+                           element.classList.contains('admin-login') ||
+                           element.classList.contains('pdf-image-page');
                 }
             },
             jsPDF: { 
                 unit: 'mm', 
                 format: 'a4', 
-                orientation: 'landscape',
-                compress: true
-            },
-            pagebreak: { 
-                mode: ['avoid-all', 'css'],
-                before: '.pdf-page',
-                after: '.pdf-page',
-                avoid: '.pdf-worship-item, .pdf-notice-item'
+                orientation: 'landscape'  // Landscape like the traditional bulletin
             }
         };
         
-        // Generate PDF with better error handling and fallback
+        // Generate PDF from the PDF layout (traditional bulletin style)
+        await html2pdf().set(opt).from(pdfLayout).save();
+        console.log('Traditional bulletin PDF generated successfully');
+        alert('✅ PDF가 성공적으로 생성되었습니다!\n\n📁 파일명: 새 주보.pdf\n📝 전통적인 주보 형식으로 생성되었습니다.');
+        
+    } catch (error) {
+        console.error('Error generating traditional bulletin PDF:', error);
+        
+        // Fallback to simpler PDF layout
         try {
-            await html2pdf().set(opt).from(pdfLayout).save();
-            console.log('PDF generated successfully');
-            alert('PDF가 성공적으로 생성되었습니다!');
-        } catch (pdfError) {
-            console.error('Primary PDF generation failed:', pdfError);
-            console.log('Attempting fallback PDF generation without images...');
+            console.log('Attempting simplified traditional PDF generation...');
             
-            // Remove image pages for fallback
-            const imagePages = pdfLayout.querySelectorAll('.pdf-image-page');
-            imagePages.forEach(page => page.remove());
-            
-            // Simplified options for fallback
             const fallbackOpt = {
                 margin: [15, 15, 15, 15],
-                filename: '백령감리교회_주보.pdf',
+                filename: '새 주보-간단.pdf',
                 image: { 
                     type: 'jpeg', 
-                    quality: 0.8 
+                    quality: 1.0
                 },
                 html2canvas: { 
-                    scale: 1.2,
+                    scale: 2.0,
                     useCORS: false,
                     allowTaint: true,
                     letterRendering: true,
                     backgroundColor: '#f5f5dc',
-                    logging: true,
+                    dpi: 300,
+                    logging: false,
                     ignoreElements: function(element) {
                         return element.classList.contains('download-buttons') || 
                                element.classList.contains('admin-login') ||
-                               element.classList.contains('pdf-image-page');
+                               element.classList.contains('pdf-image-page') ||
+                               element.tagName === 'IMG';
                     }
                 },
                 jsPDF: { 
                     unit: 'mm', 
                     format: 'a4', 
-                    orientation: 'landscape'
+                    orientation: 'landscape',
+                    compress: false,
                 }
             };
             
-            try {
-                await html2pdf().set(fallbackOpt).from(pdfLayout).save();
-                console.log('Fallback PDF generated successfully');
-                alert('✅ PDF가 성공적으로 생성되었습니다!\n\n📝 주보 내용이 포함되었습니다.\n🖼️ 이미지는 브라우저 보안 정책으로 인해 제외되었습니다.\n\n💡 이미지가 필요한 경우 "🖼️ 이미지 다운로드" 버튼을 사용해주세요.');
-            } catch (fallbackError) {
-                console.error('Fallback PDF generation also failed:', fallbackError);
-                alert(`❌ PDF 생성에 실패했습니다.\n\n브라우저 콘솔을 확인해주세요.\n오류: ${fallbackError.message}\n\n💡 다른 브라우저(Chrome 권장)에서 시도해보세요.`);
-            }
+            await html2pdf().set(fallbackOpt).from(pdfLayout).save();
+            console.log('Simplified traditional PDF generated successfully');
+            alert('✅ PDF가 성공적으로 생성되었습니다!\n\n📁 파일명: 새 주보-간단.pdf\n📝 간단한 전통 주보 형식으로 저장되었습니다.');
+            
+        } catch (fallbackError) {
+            console.error('Fallback PDF generation also failed:', fallbackError);
+            alert(`❌ PDF 생성에 실패했습니다.\n\n오류: ${error.message}\n\n💡 브라우저를 새로고침하고 다시 시도해보세요.`);
         }
         
-    } catch (error) {
-        console.error('Error during PDF generation setup:', error);
-        alert(`PDF 생성 준비 중 오류가 발생했습니다: ${error.message}`);
     } finally {
         // Always restore the original layout
         restoreOriginalLayout(regularContent, pdfLayout, buttons, adminLogin);
@@ -709,91 +694,140 @@ function downloadWord() {
     console.log('Word document generated successfully');
 }
 
-// Download as Image
-function downloadImage() {
+// Simplified Image download function to avoid formatting issues
+async function downloadImage() {
     const regularContent = document.getElementById('bulletin-content');
-    const pdfLayout = document.getElementById('pdf-layout');
     const buttons = document.querySelector('.download-buttons');
+    const adminLogin = document.querySelector('.admin-login');
     
-    if (!regularContent || !pdfLayout || !buttons) {
+    if (!regularContent || !buttons) {
         console.error('Required elements not found for Image generation');
+        alert('이미지 생성에 필요한 요소를 찾을 수 없습니다.');
         return;
     }
     
-    // Hide the download buttons temporarily
-    buttons.style.display = 'none';
+    console.log('Starting simplified image generation...');
     
-    // Hide regular content and show PDF layout
-    regularContent.style.display = 'none';
-    pdfLayout.classList.add('active');
-    
-    // Update PDF layout with current data
-    updatePDFLayout();
-    
-    // Use html2canvas to capture the PDF layout as image
-    const opt = {
-        scale: 2,
-        useCORS: true,
-        letterRendering: true,
-        allowTaint: true,
-        backgroundColor: '#f5f5dc',
-        width: pdfLayout.offsetWidth,
-        height: pdfLayout.offsetHeight
-    };
-    
-    // Import html2canvas from html2pdf bundle
-    const html2canvas = window.html2pdf().from(pdfLayout).outputImg();
-    
-    // Alternative approach using canvas
-    import('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js')
-        .then(() => {
-            return html2canvas(pdfLayout, opt);
-        })
-        .then(canvas => {
-            // Create download link
+    try {
+        // Hide UI elements that shouldn't appear in image
+        buttons.style.display = 'none';
+        if (adminLogin) adminLogin.style.display = 'none';
+        
+        // Wait for layout to settle
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        console.log('Capturing regular content as image...');
+        
+        // Check if html2canvas is available (should be loaded with html2pdf)
+        if (typeof html2canvas === 'undefined') {
+            throw new Error('html2canvas is not available');
+        }
+        
+        // Simplified html2canvas options for better reliability
+        const canvasOptions = {
+            scale: 1.5,  // Moderate scale for good quality without issues
+            useCORS: false,
+            allowTaint: true,
+            letterRendering: true,
+            backgroundColor: '#ffffff',  // Simple white background
+            logging: false,
+            removeContainer: true,
+            ignoreElements: function(element) {
+                // Ignore problematic elements
+                return element.classList.contains('download-buttons') || 
+                       element.classList.contains('admin-login') ||
+                       element.classList.contains('pdf-layout') ||
+                       element.classList.contains('pdf-image-page') ||
+                       element.tagName === 'SCRIPT' ||
+                       element.tagName === 'STYLE';
+            }
+        };
+        
+        // Generate canvas from the regular content (not complex PDF layout)
+        const canvas = await html2canvas(regularContent, canvasOptions);
+        
+        // Convert canvas to blob
+        const blob = await new Promise(resolve => {
+            canvas.toBlob(resolve, 'image/png', 0.9);
+        });
+        
+        if (!blob) {
+            throw new Error('Failed to create image blob');
+        }
+        
+        // Create download with proper file path format
+        const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '');
+        const filename = `백령감리교회_주보_${timestamp}.png`;
+        
+        // Create download link
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.style.display = 'none';
+        
+        // Add to DOM, click, and remove
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Clean up the URL object
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        
+        console.log(`Simplified image generated successfully: ${filename}`);
+        alert(`✅ 이미지가 성공적으로 생성되었습니다!\n\n📁 파일명: ${filename}\n💾 다운로드 폴더에 저장되었습니다.`);
+        
+    } catch (error) {
+        console.error('Error generating simplified image:', error);
+        
+        // Ultra-simple fallback using html2pdf
+        try {
+            console.log('Attempting ultra-simple image generation...');
+            
+            const ultraSimpleOptions = {
+                margin: 0,
+                filename: `백령감리교회_주보_${new Date().toISOString().slice(0, 10)}.png`,
+                image: { 
+                    type: 'png', 
+                    quality: 0.8 
+                },
+                html2canvas: { 
+                    scale: 1,
+                    backgroundColor: '#ffffff',
+                    logging: false,
+                    ignoreElements: function(element) {
+                        return element.classList.contains('download-buttons') || 
+                               element.classList.contains('admin-login') ||
+                               element.tagName === 'IMG';  // Skip images to avoid issues
+                    }
+                }
+            };
+            
+            // Use html2pdf to generate image from regular content
+            const imgData = await html2pdf().set(ultraSimpleOptions).from(regularContent).outputImg('png');
+            
+            // Create download link for fallback
             const link = document.createElement('a');
-            link.download = '백령감리교회_주보.png';
-            link.href = canvas.toDataURL('image/png');
+            link.download = ultraSimpleOptions.filename;
+            link.href = imgData;
+            link.style.display = 'none';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             
-            console.log('Image generated successfully');
-        })
-        .catch(error => {
-            console.error('Error generating image:', error);
+            console.log('Ultra-simple image generated successfully');
+            alert('✅ 이미지가 성공적으로 생성되었습니다!\n\n📝 텍스트 위주의 간단한 형식으로 저장되었습니다.');
             
-            // Fallback: use html2pdf to generate image
-            html2pdf().set({
-                margin: 0,
-                filename: '백령감리교회_주보.png',
-                image: { type: 'png', quality: 1.00 },
-                html2canvas: { 
-                    scale: 2,
-                    useCORS: true,
-                    letterRendering: true,
-                    backgroundColor: '#f5f5dc'
-                },
-                jsPDF: { 
-                    unit: 'mm', 
-                    format: 'a4', 
-                    orientation: 'landscape' 
-                }
-            }).from(pdfLayout).outputImg('png').then(imgData => {
-                const link = document.createElement('a');
-                link.download = '백령감리교회_주보.png';
-                link.href = imgData;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            });
-        })
-        .finally(() => {
-            // Restore original layout
-            pdfLayout.classList.remove('active');
-            regularContent.style.display = 'block';
-            buttons.style.display = 'flex';
-        });
+        } catch (fallbackError) {
+            console.error('Ultra-simple image generation also failed:', fallbackError);
+            alert(`❌ 이미지 생성에 실패했습니다.\n\n오류: ${error.message}\n\n💡 브라우저를 새로고침하고 다시 시도해보세요.`);
+        }
+        
+    } finally {
+        // Always restore the original layout
+        if (buttons) buttons.style.display = 'flex';
+        if (adminLogin) adminLogin.style.display = 'block';
+    }
 }
 
 // Initialize when DOM is loaded
