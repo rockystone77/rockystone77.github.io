@@ -396,7 +396,7 @@ async function downloadPDF() {
                 quality: 0.85 
             },
             html2canvas: { 
-                scale: 1.2,  // Good quality for traditional layout
+                scale: 2.5,  // Good quality for traditional layout
                 useCORS: false,
                 allowTaint: true,
                 dpi: 300,
@@ -404,6 +404,11 @@ async function downloadPDF() {
                 backgroundColor: '#f5f5dc',  // Beige background like the image
                 logging: false,
                 removeContainer: true,
+                imageSmoothingEnabled: false,  // Enable image smoothing
+                mozImageSmoothingEnabled: false,
+                oImageSmoothingEnabled: false,
+                webkitImageSmoothingEnabled: false,
+                msImageSmoothingEnabled: false,
                 ignoreElements: function(element) {
                     // Ignore problematic elements but keep PDF layout
                     return element.classList.contains('download-buttons') || 
