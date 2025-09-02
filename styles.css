@@ -454,23 +454,25 @@ body {
 
 /* PDF-specific styles for landscape layout */
 .pdf-layout {
-    display: none;
+    display: none !important;
+    visibility: hidden;
 }
 
 .pdf-layout.active {
     display: block !important;
-    width: 800px;
-    min-height: 600px;
-    margin: 0;
-    padding: 20px;
-    background: #f5f5dc;
-    font-family: 'Malgun Gothic', '맑은 고딕', Arial, sans-serif;
-    font-size: 14px;
-    line-height: 1.4;
-    box-sizing: border-box;
-    color: #000;
-    position: relative;
-    visibility: visible;
+    visibility: visible !important;
+    width: 800px !important;
+    min-height: 600px !important;
+    margin: 0 !important;
+    padding: 20px !important;
+    background: #f5f5dc !important;
+    font-family: 'Malgun Gothic', '맑은 고딕', 'Arial', sans-serif !important;
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+    box-sizing: border-box !important;
+    color: #000 !important;
+    position: relative !important;
+    z-index: 9999 !important;
 }
 
 .pdf-page {
@@ -493,17 +495,20 @@ body {
 }
 
 .pdf-two-column {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    height: calc(100% - 30px);
+    display: table !important;
+    width: 100% !important;
+    table-layout: fixed !important;
+    border-spacing: 20px 0 !important;
+    height: calc(100% - 30px) !important;
 }
 
 .pdf-left-column,
 .pdf-right-column {
-    display: flex;
-    flex-direction: column;
-    background: #f5f5dc;
+    display: table-cell !important;
+    vertical-align: top !important;
+    width: 50% !important;
+    background: #f5f5dc !important;
+    padding: 0 10px !important;
 }
 
 /* Page 1 - Left Column (Worship Order) */
@@ -664,19 +669,22 @@ body {
 }
 
 .pdf-financial-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 7px;
-    background: white;
-    border-radius: 2px;
-    overflow: hidden;
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 7px !important;
+    background: white !important;
+    border-radius: 2px !important;
+    overflow: hidden !important;
+    margin: 0 !important;
 }
 
 .pdf-financial-table td {
-    border: 1px solid #666;
-    padding: 1mm;
-    text-align: center;
-    vertical-align: middle;
+    border: 1px solid #666 !important;
+    padding: 2px !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    font-size: 7px !important;
+    line-height: 1.2 !important;
 }
 
 .pdf-table-label {

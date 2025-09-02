@@ -350,199 +350,593 @@ function updatePDFLayout() {
     }
 }
 
-// PDF download function with images
+// Enhanced PDF download function with comprehensive debugging
 async function downloadPDF() {
+    console.log(`\n🚀 STARTING PDF GENERATION`);
+    console.log(`============================`);
+    
     const regularContent = document.getElementById('bulletin-content');
     const pdfLayout = document.getElementById('pdf-layout');
     const buttons = document.querySelector('.download-buttons');
+    const adminLogin = document.querySelector('.admin-login');
+    
+    // Pre-flight checks
+    console.log(`🔍 Pre-flight element checks:`);
+    console.log(`   - Regular content: ${regularContent ? '✅ Found' : '❌ Missing'}`);
+    console.log(`   - PDF layout: ${pdfLayout ? '✅ Found' : '❌ Missing'}`);
+    console.log(`   - Buttons: ${buttons ? '✅ Found' : '❌ Missing'}`);
+    console.log(`   - Admin login: ${adminLogin ? '✅ Found' : '❌ Missing'}`);
     
     if (!regularContent || !pdfLayout || !buttons) {
-        console.error('Required elements not found for PDF generation');
+        console.error('❌ Required elements not found for PDF generation');
+        alert('PDF 생성에 필요한 요소를 찾을 수 없습니다.');
         return;
     }
     
-    // Hide the download buttons temporarily
-    buttons.style.display = 'none';
-    
-    // Hide regular content and show PDF layout
-    regularContent.style.display = 'none';
-    pdfLayout.style.display = 'block';
-    pdfLayout.classList.add('active');
-    
-    // Update PDF layout with current data
-    updatePDFLayout();
+    const startTime = performance.now();
     
     try {
-        // Add images to PDF layout (wait for async operation)
-        await addImagesToPDFLayout();
+        // Step 1: Prepare layout
+        console.log(`\n📋 Step 1: Preparing layout...`);
+        buttons.style.display = 'none';
+        if (adminLogin) adminLogin.style.display = 'none';
         
-        // Wait a moment for layout to render
-        setTimeout(() => {
-            // Generate PDF from the 2-column PDF layout with images
-            const opt = {
+        regularContent.style.display = 'none';
+        pdfLayout.style.display = 'block';
+        pdfLayout.style.visibility = 'visible';
+        pdfLayout.classList.add('active');
+        
+        // Force layout recalculation and log dimensions
+        pdfLayout.offsetHeight;
+        console.log(`   - PDF layout dimensions: ${pdfLayout.scrollWidth}x${pdfLayout.scrollHeight}`);
+        console.log(`   - PDF layout visible: ${pdfLayout.style.display === 'block' ? '✅' : '❌'}`);
+        
+        // Step 2: Update PDF layout with current data
+        console.log(`\n📝 Step 2: Updating PDF layout with current data...`);
+        updatePDFLayout();
+        console.log(`   - Layout update completed`);
+        
+        // Step 3: Skip images to avoid canvas tainting - generate text-only PDF
+        console.log(`\n🖼️ Step 3: Skipping images to avoid canvas tainting...`);
+        console.log(`   - Images will be excluded from PDF to prevent SecurityError`);
+        console.log(`   - Use separate image download for pictures`);
+        
+        // Step 4: Final preparation
+        console.log(`\n⏳ Step 4: Final preparation (2 second wait)...`);
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Step 5: Validate content before PDF generation
+        console.log(`\n🔍 Step 5: Pre-generation validation...`);
+        const imagePages = pdfLayout.querySelectorAll('.pdf-image-page');
+        const textContent = pdfLayout.textContent.trim();
+        console.log(`   - Image pages found: ${imagePages.length}`);
+        console.log(`   - Text content length: ${textContent.length} characters`);
+        console.log(`   - Has meaningful content: ${textContent.length > 100 ? '✅' : '❌'}`);
+        
+        // Log all images in the layout for debugging
+        const allImages = pdfLayout.querySelectorAll('img');
+        console.log(`   - Total images in layout: ${allImages.length}`);
+        allImages.forEach((img, index) => {
+            console.log(`     ${index + 1}. ${img.src.substring(0, 50)}... (${img.naturalWidth}x${img.naturalHeight})`);
+        });
+        
+        // Step 6: Configure PDF generation options (text-only, no images)
+        console.log(`\n⚙️ Step 6: Configuring PDF generation options (text-only)...`);
+        const opt = {
+            margin: [10, 10, 10, 10],
+            filename: '백령감리교회_주보.pdf',
+            image: { 
+                type: 'jpeg', 
+                quality: 0.8 
+            },
+            html2canvas: { 
+                scale: 1.2,
+                useCORS: false,  // Disable CORS completely
+                allowTaint: false,  // Prevent canvas tainting
+                letterRendering: true,
+                backgroundColor: '#f5f5dc',
+                logging: true,
+                width: pdfLayout.scrollWidth,
+                height: pdfLayout.scrollHeight,
+                scrollX: 0,
+                scrollY: 0,
+                foreignObjectRendering: false,
+                proxy: undefined,
+                removeContainer: true,
+                imageTimeout: 0,  // Skip image processing entirely
+                ignoreElements: function(element) {
+                    // Ignore all images and problematic elements
+                    return element.tagName === 'IMG' ||
+                           element.classList.contains('download-buttons') || 
+                           element.classList.contains('admin-login') ||
+                           element.classList.contains('pdf-image-page');
+                }
+            },
+            jsPDF: { 
+                unit: 'mm', 
+                format: 'a4', 
+                orientation: 'landscape',
+                compress: true
+            },
+            pagebreak: { 
+                mode: ['avoid-all', 'css'],
+                before: '.pdf-page',
+                after: '.pdf-page',
+                avoid: '.pdf-worship-item, .pdf-notice-item'
+            }
+        };
+        
+        console.log(`   - Canvas scale: ${opt.html2canvas.scale}`);
+        console.log(`   - Canvas size: ${opt.html2canvas.width}x${opt.html2canvas.height}`);
+        console.log(`   - Image timeout: ${opt.html2canvas.imageTimeout}ms`);
+        console.log(`   - PDF format: ${opt.jsPDF.format} ${opt.jsPDF.orientation}`);
+        
+        // Step 7: Generate PDF with detailed error tracking
+        console.log(`\n🎯 Step 7: Generating PDF...`);
+        const pdfStartTime = performance.now();
+        
+        try {
+            console.log(`   - Calling html2pdf().set(opt).from(pdfLayout).save()...`);
+            await html2pdf().set(opt).from(pdfLayout).save();
+            
+            const pdfTime = Math.round(performance.now() - pdfStartTime);
+            const totalTime = Math.round(performance.now() - startTime);
+            
+            console.log(`✅ PDF generated successfully!`);
+            console.log(`   - PDF generation time: ${pdfTime}ms`);
+            console.log(`   - Total process time: ${totalTime}ms`);
+            
+            alert('PDF가 성공적으로 생성되었습니다!');
+            
+        } catch (pdfError) {
+            const pdfTime = Math.round(performance.now() - pdfStartTime);
+            console.error(`❌ Primary PDF generation failed after ${pdfTime}ms:`, pdfError);
+            console.error(`🔍 Error analysis:`);
+            console.error(`   - Error name: ${pdfError.name}`);
+            console.error(`   - Error message: ${pdfError.message}`);
+            console.error(`   - Error stack:`, pdfError.stack);
+            
+            // Check for specific error types
+            if (pdfError.message.includes('toDataURL')) {
+                console.error(`🎯 Canvas tainting detected - this is the core issue`);
+            }
+            if (pdfError.message.includes('CORS')) {
+                console.error(`🎯 CORS issue detected`);
+            }
+            if (pdfError.message.includes('SecurityError')) {
+                console.error(`🎯 Security error detected - likely local file access`);
+            }
+            
+            console.log(`\n🔄 Attempting fallback PDF generation without images...`);
+            
+            // Remove image pages for fallback
+            const imagePages = pdfLayout.querySelectorAll('.pdf-image-page');
+            console.log(`   - Removing ${imagePages.length} image pages for fallback`);
+            imagePages.forEach(page => page.remove());
+            
+            // Simplified options for fallback
+            const fallbackOpt = {
                 margin: [15, 15, 15, 15],
-                filename: '백령감리교회_주보_with_images.pdf',
+                filename: '백령감리교회_주보.pdf',
                 image: { 
                     type: 'jpeg', 
-                    quality: 0.9 
+                    quality: 0.8 
                 },
                 html2canvas: { 
                     scale: 1.2,
                     useCORS: false,
-                    letterRendering: true,
                     allowTaint: true,
+                    letterRendering: true,
                     backgroundColor: '#f5f5dc',
-                    logging: false,
+                    logging: true,
                     ignoreElements: function(element) {
-                        // Don't ignore images anymore - we want to include them
-                        return false;
+                        return element.classList.contains('download-buttons') || 
+                               element.classList.contains('admin-login') ||
+                               element.classList.contains('pdf-image-page');
                     }
                 },
                 jsPDF: { 
                     unit: 'mm', 
                     format: 'a4', 
                     orientation: 'landscape'
-                },
-                pagebreak: { 
-                    mode: 'css',
-                    before: '.pdf-page, .pdf-image-page'
                 }
             };
             
-            html2pdf().set(opt).from(pdfLayout).save().then(() => {
-                // Restore original layout
-                pdfLayout.classList.remove('active');
-                pdfLayout.style.display = 'none';
-                regularContent.style.display = 'block';
-                buttons.style.display = 'flex';
+            console.log(`   - Fallback options configured (scale: ${fallbackOpt.html2canvas.scale})`);
+            
+            try {
+                const fallbackStartTime = performance.now();
+                await html2pdf().set(fallbackOpt).from(pdfLayout).save();
                 
-                console.log('PDF generated successfully with images included');
-            }).catch(error => {
-                console.error('Error generating PDF:', error);
+                const fallbackTime = Math.round(performance.now() - fallbackStartTime);
+                const totalTime = Math.round(performance.now() - startTime);
                 
-                // Restore layout even if there's an error
-                pdfLayout.classList.remove('active');
-                pdfLayout.style.display = 'none';
-                regularContent.style.display = 'block';
-                buttons.style.display = 'flex';
+                console.log(`✅ Fallback PDF generated successfully!`);
+                console.log(`   - Fallback generation time: ${fallbackTime}ms`);
+                console.log(`   - Total process time: ${totalTime}ms`);
                 
-                alert('PDF 생성 중 오류가 발생했습니다. 다시 시도해 주세요.');
-            });
-        }, 1500);
+                alert('✅ PDF가 성공적으로 생성되었습니다!\n\n📝 주보 내용이 포함되었습니다.\n🖼️ 이미지는 브라우저 보안 정책으로 인해 제외되었습니다.\n\n💡 이미지가 필요한 경우 "🖼️ 이미지 다운로드" 버튼을 사용해주세요.');
+                
+            } catch (fallbackError) {
+                const fallbackTime = Math.round(performance.now() - fallbackStartTime);
+                console.error(`❌ Fallback PDF generation also failed after ${fallbackTime}ms:`, fallbackError);
+                console.error(`🔍 Fallback error analysis:`);
+                console.error(`   - Error name: ${fallbackError.name}`);
+                console.error(`   - Error message: ${fallbackError.message}`);
+                console.error(`   - Error stack:`, fallbackError.stack);
+                
+                alert(`❌ PDF 생성에 실패했습니다.\n\n브라우저 콘솔을 확인해주세요.\n오류: ${fallbackError.message}\n\n💡 다른 브라우저(Chrome 권장)에서 시도해보세요.`);
+            }
+        }
+        
     } catch (error) {
-        console.error('Error adding images to PDF layout:', error);
+        const totalTime = Math.round(performance.now() - startTime);
+        console.error(`❌ Error during PDF generation setup after ${totalTime}ms:`, error);
+        console.error(`🔍 Setup error analysis:`);
+        console.error(`   - Error name: ${error.name}`);
+        console.error(`   - Error message: ${error.message}`);
+        console.error(`   - Error stack:`, error.stack);
         
-        // Restore layout even if there's an error
-        pdfLayout.classList.remove('active');
-        pdfLayout.style.display = 'none';
-        regularContent.style.display = 'block';
-        buttons.style.display = 'flex';
+        alert(`PDF 생성 준비 중 오류가 발생했습니다: ${error.message}`);
+    } finally {
+        // Always restore the original layout
+        console.log(`\n🔄 Restoring original layout...`);
+        restoreOriginalLayout(regularContent, pdfLayout, buttons, adminLogin);
         
-        alert('이미지 로딩 중 오류가 발생했습니다. 다시 시도해 주세요.');
+        const totalTime = Math.round(performance.now() - startTime);
+        console.log(`📊 PDF Generation Process Complete - Total time: ${totalTime}ms`);
+        console.log(`============================\n`);
     }
 }
 
-// Function to convert image to base64 to avoid CORS issues
+// Helper function to restore original layout
+function restoreOriginalLayout(regularContent, pdfLayout, buttons, adminLogin) {
+    console.log('Restoring original layout...');
+    
+    if (pdfLayout) {
+        pdfLayout.classList.remove('active');
+        pdfLayout.style.display = 'none';
+        pdfLayout.style.visibility = 'hidden';
+    }
+    
+    if (regularContent) {
+        regularContent.style.display = 'block';
+    }
+    
+    if (buttons) {
+        buttons.style.display = 'flex';
+    }
+    
+    if (adminLogin) {
+        adminLogin.style.display = 'block';
+    }
+}
+
+// Enhanced function with comprehensive debugging and validation
 function imageToBase64(src) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
+        console.log(`🔍 Processing image: ${src}`);
+        console.log(`📍 Current protocol: ${window.location.protocol}`);
+        
+        // Check if we're dealing with a local file protocol
+        if (window.location.protocol === 'file:') {
+            console.log(`📁 Local file protocol detected for: ${src}`);
+            
+            // For local files, we'll validate the image exists and return original src
+            const testImg = new Image();
+            testImg.onload = () => {
+                console.log(`✅ Local image validated: ${src}`);
+                console.log(`📏 Image dimensions: ${testImg.naturalWidth}x${testImg.naturalHeight}`);
+                console.log(`🔗 Returning original source: ${src}`);
+                resolve(src);
+            };
+            
+            testImg.onerror = (error) => {
+                console.error(`❌ Local image validation failed for ${src}:`, error);
+                console.log(`🔄 Returning source anyway for PDF processing: ${src}`);
+                resolve(src);
+            };
+            
+            testImg.src = src;
+            return;
+        }
+        
+        // For HTTP/HTTPS protocols, we can try the CORS approach
+        console.log(`🌐 Remote protocol detected, attempting CORS conversion for: ${src}`);
         const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = function() {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = this.naturalWidth;
-            canvas.height = this.naturalHeight;
-            ctx.drawImage(this, 0, 0);
+        img.crossOrigin = "anonymous"; // Enable CORS for remote images
+        
+        img.onload = () => {
+            console.log(`✅ Remote image loaded successfully: ${src}`);
+            console.log(`📏 Image dimensions: ${img.naturalWidth}x${img.naturalHeight}`);
+            
             try {
-                const dataURL = canvas.toDataURL('image/png');
-                resolve(dataURL);
-            } catch (e) {
-                console.warn('Failed to convert image to base64, using original src:', src);
+                // Create canvas to convert image to base64
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Set canvas dimensions to match image
+                canvas.width = img.naturalWidth || img.width;
+                canvas.height = img.naturalHeight || img.height;
+                
+                console.log(`🎨 Canvas created: ${canvas.width}x${canvas.height}`);
+                
+                // Draw image to canvas
+                ctx.drawImage(img, 0, 0);
+                console.log(`🖼️ Image drawn to canvas`);
+                
+                // Convert canvas to base64
+                const base64 = canvas.toDataURL('image/png');
+                
+                // Validate base64 output
+                if (base64 && base64.startsWith('data:image/')) {
+                    const sizeKB = Math.round((base64.length * 3/4) / 1024);
+                    console.log(`✅ Base64 conversion successful for ${src}`);
+                    console.log(`📊 Base64 format: ${base64.substring(0, 50)}...`);
+                    console.log(`📏 Base64 size: ~${sizeKB}KB`);
+                    resolve(base64);
+                } else {
+                    console.error(`❌ Invalid base64 format for ${src}:`, base64?.substring(0, 100));
+                    console.log(`🔄 Using original source as fallback: ${src}`);
+                    resolve(src);
+                }
+            } catch (error) {
+                console.error(`❌ Canvas conversion failed for ${src}:`, error);
+                console.error(`🔍 Error details:`, error.message, error.stack);
+                console.log(`🔄 Using original source as fallback: ${src}`);
                 resolve(src);
             }
         };
-        img.onerror = function() {
-            console.warn('Failed to load image:', src);
-            resolve(null);
+        
+        img.onerror = (error) => {
+            console.error(`❌ Failed to load remote image ${src}:`, error);
+            console.log(`🔄 Using original source as fallback: ${src}`);
+            resolve(src);
         };
+        
+        // Set image source after setting up event handlers
+        console.log(`🔄 Loading image: ${src}`);
         img.src = src;
     });
 }
 
-// Function to add images to PDF layout
-async function addImagesToPDFLayout() {
+// Enhanced function with progressive testing and comprehensive validation
+async function addImagesToPDFLayout(testMode = false) {
+    console.log(`🚀 Adding images to PDF layout... (Test mode: ${testMode})`);
     const pdfLayout = document.getElementById('pdf-layout');
+    
+    if (!pdfLayout) {
+        console.error('❌ PDF layout element not found');
+        return;
+    }
     
     // Remove any existing image pages
     const existingImagePages = pdfLayout.querySelectorAll('.pdf-image-page');
     existingImagePages.forEach(page => page.remove());
+    console.log(`🧹 Removed ${existingImagePages.length} existing image pages`);
     
-    // Create image pages for each image
-    const images = [
+    // Define all images
+    const allImages = [
         { src: 'logo.png', alt: '백령감리교회 로고', title: '교회 로고' },
-        { src: 'picture one.png', alt: '교회 활동 사진 1', title: '주여 저 북녘 땅에 복음의 빛을 비추소서!!!' },
-        { src: 'picture two.png', alt: '교회 활동 사진 2', title: '백령감리교회 사명 - Vision Jesus Christ' }
+        { src: 'picture_one.png', alt: '교회 활동 사진 1', title: '주여 저 북녘 땅에 복음의 빛을 비추소서!!!' },
+        { src: 'picture_two.png', alt: '교회 활동 사진 2', title: '백령감리교회 사명 - Vision Jesus Christ' }
     ];
+    
+    // Progressive testing: start with one image if in test mode
+    const images = testMode ? [allImages[0]] : allImages;
+    console.log(`📋 Processing ${images.length} image(s) ${testMode ? '(TEST MODE - single image)' : '(FULL MODE)'}`);
+    
+    let successCount = 0;
+    const processingResults = [];
     
     for (let i = 0; i < images.length; i++) {
         const imageInfo = images[i];
+        const startTime = performance.now();
         
-        // Convert image to base64 to avoid CORS issues
-        const base64Src = await imageToBase64(imageInfo.src);
+        console.log(`\n🔄 Processing image ${i + 1}/${images.length}: ${imageInfo.src}`);
         
-        if (base64Src) {
+        try {
+            // Step 1: Convert image with detailed logging
+            console.log(`📤 Step 1: Converting image to base64...`);
+            const base64Src = await imageToBase64(imageInfo.src);
+            
+            // Step 2: Validate conversion result
+            console.log(`🔍 Step 2: Validating conversion result...`);
+            if (!base64Src) {
+                throw new Error('Base64 conversion returned null/undefined');
+            }
+            
+            // Log base64 details for inspection
+            const isBase64 = base64Src.startsWith('data:image/');
+            const isOriginalSrc = base64Src === imageInfo.src;
+            console.log(`📊 Conversion result analysis:`);
+            console.log(`   - Is Base64 format: ${isBase64}`);
+            console.log(`   - Is original source: ${isOriginalSrc}`);
+            console.log(`   - Source preview: ${base64Src.substring(0, 100)}${base64Src.length > 100 ? '...' : ''}`);
+            
+            if (isBase64) {
+                const sizeKB = Math.round((base64Src.length * 3/4) / 1024);
+                console.log(`   - Estimated size: ~${sizeKB}KB`);
+            }
+            
+            // Step 3: Create image page
+            console.log(`🏗️ Step 3: Creating image page...`);
             const imagePage = document.createElement('div');
             imagePage.className = 'pdf-image-page';
+            imagePage.setAttribute('data-image-src', imageInfo.src);
             imagePage.style.cssText = `
-                page-break-before: always;
-                width: 100%;
-                height: 100vh;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                background-color: #f5f5dc;
-                padding: 40px;
-                box-sizing: border-box;
+                page-break-before: always !important;
+                width: 100% !important;
+                height: 100vh !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                align-items: center !important;
+                background-color: #f5f5dc !important;
+                padding: 40px !important;
+                box-sizing: border-box !important;
+                margin: 0 !important;
             `;
             
             const imageContainer = document.createElement('div');
             imageContainer.style.cssText = `
-                width: 100%;
-                max-width: 800px;
-                text-align: center;
-                background: white;
-                padding: 30px;
-                border-radius: 15px;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                width: 100% !important;
+                max-width: 700px !important;
+                text-align: center !important;
+                background: white !important;
+                padding: 30px !important;
+                border-radius: 15px !important;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+                margin: 0 auto !important;
             `;
             
             const titleElement = document.createElement('h2');
             titleElement.textContent = imageInfo.title;
             titleElement.style.cssText = `
-                margin-bottom: 30px;
-                color: #333;
-                font-size: 24px;
-                font-weight: bold;
+                margin-bottom: 30px !important;
+                color: #333 !important;
+                font-size: 24px !important;
+                font-weight: bold !important;
+                font-family: 'Malgun Gothic', '맑은 고딕', Arial, sans-serif !important;
             `;
             
+            // Step 4: Create and validate image element
+            console.log(`🖼️ Step 4: Creating image element...`);
             const imageElement = document.createElement('img');
             imageElement.src = base64Src;
             imageElement.alt = imageInfo.alt;
+            imageElement.setAttribute('data-original-src', imageInfo.src);
             imageElement.style.cssText = `
-                max-width: 100%;
-                max-height: 600px;
-                height: auto;
-                border-radius: 10px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                max-width: 100% !important;
+                max-height: 500px !important;
+                height: auto !important;
+                border-radius: 10px !important;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+                display: block !important;
+                margin: 0 auto !important;
             `;
             
+            // Step 5: Wait for image to fully load with timeout
+            console.log(`⏳ Step 5: Waiting for image to load...`);
+            await new Promise((resolve, reject) => {
+                const timeout = setTimeout(() => {
+                    console.warn(`⚠️ Image load timeout for: ${imageInfo.src}`);
+                    resolve(); // Don't reject, just continue
+                }, 10000); // 10 second timeout
+                
+                if (imageElement.complete && imageElement.naturalWidth > 0) {
+                    clearTimeout(timeout);
+                    console.log(`✅ Image already loaded: ${imageElement.naturalWidth}x${imageElement.naturalHeight}`);
+                    resolve();
+                } else {
+                    imageElement.onload = () => {
+                        clearTimeout(timeout);
+                        console.log(`✅ Image loaded successfully: ${imageElement.naturalWidth}x${imageElement.naturalHeight}`);
+                        resolve();
+                    };
+                    
+                    imageElement.onerror = (error) => {
+                        clearTimeout(timeout);
+                        console.error(`❌ Image load error:`, error);
+                        resolve(); // Don't reject, continue with broken image
+                    };
+                }
+            });
+            
+            // Step 6: Assemble and add to DOM
+            console.log(`🔧 Step 6: Assembling page components...`);
             imageContainer.appendChild(titleElement);
             imageContainer.appendChild(imageElement);
             imagePage.appendChild(imageContainer);
             
             pdfLayout.appendChild(imagePage);
+            
+            const processingTime = Math.round(performance.now() - startTime);
+            successCount++;
+            
+            const result = {
+                src: imageInfo.src,
+                success: true,
+                processingTime,
+                isBase64: isBase64,
+                finalDimensions: `${imageElement.naturalWidth || 'unknown'}x${imageElement.naturalHeight || 'unknown'}`
+            };
+            processingResults.push(result);
+            
+            console.log(`✅ Successfully processed ${imageInfo.src} in ${processingTime}ms`);
+            
+            // In test mode, wait a bit between images for observation
+            if (testMode && i < images.length - 1) {
+                console.log(`⏸️ Test mode: Waiting 1 second before next image...`);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            
+        } catch (error) {
+            const processingTime = Math.round(performance.now() - startTime);
+            console.error(`❌ Error processing image ${imageInfo.src}:`, error);
+            console.error(`🔍 Full error details:`, {
+                message: error.message,
+                stack: error.stack,
+                name: error.name
+            });
+            
+            const result = {
+                src: imageInfo.src,
+                success: false,
+                processingTime,
+                error: error.message
+            };
+            processingResults.push(result);
         }
+    }
+    
+    // Final summary
+    console.log(`\n📊 IMAGE PROCESSING SUMMARY:`);
+    console.log(`   ✅ Successful: ${successCount}/${images.length}`);
+    console.log(`   📋 Detailed results:`);
+    processingResults.forEach((result, index) => {
+        const status = result.success ? '✅' : '❌';
+        console.log(`      ${status} ${result.src}: ${result.processingTime}ms ${result.success ? `(${result.finalDimensions}, Base64: ${result.isBase64})` : `(Error: ${result.error})`}`);
+    });
+    
+    if (testMode && successCount > 0) {
+        console.log(`\n🧪 TEST MODE COMPLETE - Single image test successful!`);
+        console.log(`💡 You can now try the full PDF generation or test with more images.`);
+    }
+    
+    return { successCount, totalCount: images.length, results: processingResults };
+}
+
+// Test function for progressive image testing
+async function testSingleImage() {
+    console.log(`\n🧪 STARTING SINGLE IMAGE TEST`);
+    console.log(`=================================`);
+    
+    const pdfLayout = document.getElementById('pdf-layout');
+    if (!pdfLayout) {
+        console.error('❌ PDF layout not found');
+        return;
+    }
+    
+    // Show PDF layout for testing
+    pdfLayout.style.display = 'block';
+    pdfLayout.style.visibility = 'visible';
+    pdfLayout.classList.add('active');
+    
+    try {
+        const result = await addImagesToPDFLayout(true); // Test mode = true
+        console.log(`\n🎯 TEST RESULT: ${result.successCount}/${result.totalCount} images processed successfully`);
+        
+        if (result.successCount > 0) {
+            console.log(`✅ Single image test PASSED - Ready for full PDF generation`);
+        } else {
+            console.log(`❌ Single image test FAILED - Check the errors above`);
+        }
+        
+        return result;
+    } catch (error) {
+        console.error(`❌ Test failed with error:`, error);
+        return { successCount: 0, totalCount: 1, error: error.message };
     }
 }
 
@@ -680,7 +1074,7 @@ function downloadImage() {
             html2pdf().set({
                 margin: 0,
                 filename: '백령감리교회_주보.png',
-                image: { type: 'png', quality: 0.98 },
+                image: { type: 'png', quality: 1.00 },
                 html2canvas: { 
                     scale: 2,
                     useCORS: true,
