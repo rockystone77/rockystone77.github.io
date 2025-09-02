@@ -5,518 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>백령감리교회 주보</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Malgun Gothic', '맑은 고딕', Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-            position: relative;
-        }
-
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="cross" patternUnits="userSpaceOnUse" width="20" height="20"><path d="M10 0v20M0 10h20" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23cross)"/></svg>');
-            opacity: 0.3;
-        }
-
-        .church-name {
-            font-size: 2.5em;
-            font-weight: bold;
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .church-subtitle {
-            font-size: 1.2em;
-            opacity: 0.9;
-            position: relative;
-            z-index: 1;
-        }
-
-        .date-info {
-            background: #f8f9fa;
-            padding: 15px;
-            text-align: center;
-            border-bottom: 3px solid #e9ecef;
-            font-weight: bold;
-            color: #495057;
-        }
-
-        .content {
-            padding: 30px;
-        }
-
-        .section {
-            margin-bottom: 40px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 25px;
-            border-left: 5px solid #667eea;
-        }
-
-        .section-title {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-        }
-
-        .section-title::before {
-            content: '✦';
-            margin-right: 10px;
-            color: #667eea;
-        }
-
-        .worship-order {
-            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
-        }
-
-        .worship-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .worship-item:last-child {
-            border-bottom: none;
-        }
-
-        .worship-item.standing {
-            background: linear-gradient(90deg, #fff3cd 0%, transparent 100%);
-            padding: 12px 15px;
-            border-radius: 5px;
-            font-weight: bold;
-        }
-
-        .worship-item.standing::before {
-            content: '※ ';
-            color: #856404;
-        }
-
-        .schedule-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .schedule-item {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            border: 2px solid #e9ecef;
-            transition: all 0.3s ease;
-        }
-
-        .schedule-item:hover {
-            border-color: #667eea;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .schedule-time {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 5px;
-        }
-
-        .schedule-name {
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .financial-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-
-        .financial-item {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            border: 2px solid #e9ecef;
-        }
-
-        .financial-amount {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #28a745;
-            margin-top: 5px;
-        }
-
-        .gospel-invitation {
-            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
-            border-left-color: #e17055;
-            text-align: center;
-        }
-
-        .gospel-verse {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 15px 0;
-            border-left: 4px solid #e17055;
-            font-style: italic;
-        }
-
-        .contact-info {
-            background: #2c3e50;
-            color: white;
-            padding: 25px;
-            text-align: center;
-        }
-
-        .contact-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .contact-item {
-            background: rgba(255,255,255,0.1);
-            padding: 15px;
-            border-radius: 8px;
-        }
-
-        .highlight {
-            background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-
-        .download-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
-            transition: all 0.3s ease;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .download-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
-        }
-
-        .download-btn:active {
-            transform: translateY(0);
-        }
-
-        .download-btn::before {
-            content: '📄';
-            font-size: 18px;
-        }
-
-        /* Admin login styles */
-        .admin-login {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 10px;
-            padding: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            border: 2px solid #e9ecef;
-            z-index: 1000;
-            min-width: 200px;
-        }
-
-        .admin-login h4 {
-            margin-bottom: 10px;
-            color: #2c3e50;
-            font-size: 14px;
-            text-align: center;
-        }
-
-        .admin-login input {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 8px;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            font-size: 12px;
-        }
-
-        .admin-login button {
-            width: 100%;
-            padding: 8px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .admin-login button:hover {
-            background: #5a6fd8;
-        }
-
-        .admin-error {
-            color: #dc3545;
-            font-size: 11px;
-            margin-top: 5px;
-            text-align: center;
-        }
-
-        .admin-success {
-            color: #28a745;
-            font-size: 11px;
-            margin-top: 5px;
-            text-align: center;
-        }
-
-        @media (max-width: 768px) {
-            .admin-login {
-                top: 10px;
-                left: 10px;
-                right: 10px;
-                width: auto;
-                min-width: auto;
-            }
-        }
-
-        /* Picture placeholder styles */
-        .pictures-section {
-            background: white;
-        }
-
-        .picture-placeholder {
-            background: #f8f9fa;
-            border: 2px dashed #dee2e6;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .picture-placeholder:hover {
-            border-color: #667eea;
-            background: #f0f4ff;
-        }
-
-        .wide-picture {
-            height: 300px;
-            width: 501px;
-            max-width: 100%;
-            margin: 0 auto;
-        }
-
-        .logo-container {
-            display: flex;
-            justify-content: center;
-            margin-top: 10px;
-        }
-
-        .logo-form {
-            height: 150px;
-            width: 200px;
-        }
-
-        .placeholder-content {
-            text-align: center;
-            color: #6c757d;
-        }
-
-        .placeholder-icon {
-            font-size: 3em;
-            display: block;
-            margin-bottom: 10px;
-        }
-
-        .placeholder-content p {
-            font-weight: bold;
-            margin-bottom: 5px;
-            font-size: 1.1em;
-        }
-
-        .placeholder-content small {
-            font-size: 0.9em;
-            opacity: 0.8;
-        }
-
-        /* Image styles */
-        .picture-container {
-            margin-bottom: 20px;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-        }
-
-        .picture-container:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-
-        .bulletin-image {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            display: block;
-        }
-
-        .wide-image {
-            height: 300px;
-            width: 501px;
-            background: white;
-        }
-
-        .logo-image {
-            height: 150px;
-            object-fit: contain;
-            background: white;
-            padding: 10px;
-        }
-
-        .picture-container.wide-picture {
-            height: 300px;
-            width: 501px;
-            max-width: 100%;
-            margin: 0 auto 20px auto;
-        }
-
-        .picture-container.logo-form {
-            height: 150px;
-            width: 200px;
-            background: white;
-            border: 2px solid #e9ecef;
-        }
-
-        /* PDF-specific styles for 4-page layout */
-        @media print {
-            body {
-                background: white !important;
-                padding: 0 !important;
-            }
-            
-            .container {
-                max-width: none !important;
-                margin: 0 !important;
-                box-shadow: none !important;
-                border-radius: 0 !important;
-            }
-            
-            /* Page 1: Header + Worship Order */
-            .worship-order {
-                page-break-after: always;
-            }
-            
-            /* Page 2: Schedule + Financial (combined) */
-            .section:nth-of-type(3) {
-                page-break-after: always;
-            }
-            
-            /* Page 3: Church News + Gospel Invitation (combined) */
-            .gospel-invitation {
-                page-break-after: always;
-            }
-            
-            /* Page 4: Contact Info */
-            .contact-info {
-                page-break-before: auto;
-            }
-            
-            .section {
-                margin-bottom: 20px !important;
-                padding: 15px !important;
-            }
-            
-            .content {
-                padding: 15px !important;
-            }
-            
-            .header {
-                padding: 20px !important;
-            }
-            
-            .date-info {
-                padding: 10px !important;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .download-btn {
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                top: auto;
-                padding: 12px 20px;
-                font-size: 14px;
-            }
-            
-            .container {
-                margin: 10px;
-                border-radius: 10px;
-            }
-            
-            .church-name {
-                font-size: 2em;
-            }
-            
-            .content {
-                padding: 20px;
-            }
-            
-            .section {
-                padding: 20px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <!-- Admin Login Panel -->
@@ -528,7 +17,11 @@
         <div id="adminMessage"></div>
     </div>
 
-    <button class="download-btn" onclick="downloadPDF()">PDF 다운로드</button>
+    <div class="download-buttons">
+        <button class="download-btn pdf-btn" onclick="downloadPDF()">📄 PDF 다운로드</button>
+        <button class="download-btn word-btn" onclick="downloadWord()">📝 Word 다운로드</button>
+        <button class="download-btn image-btn" onclick="downloadImage()">🖼️ 이미지 다운로드</button>
+    </div>
     
     <div class="container" id="bulletin-content">
         <div class="header">
@@ -787,287 +280,306 @@
         </div>
     </div>
 
-    <script>
-        // Load data from localStorage and update the bulletin content
-        function loadBulletinData() {
-            const savedData = localStorage.getItem('bulletinData');
-            if (!savedData) return;
+    <!-- PDF Layout (Hidden, only used for PDF generation) -->
+    <div class="pdf-layout" id="pdf-layout">
+        <!-- Page 1 -->
+        <div class="pdf-page">
+            <div class="pdf-date-info">교회설립 2024.10.15. 제2권 32호 2025년 8월 31일</div>
             
-            const data = JSON.parse(savedData);
-            
-            // Update basic information
-            if (data.churchName) {
-                document.querySelector('.church-name').textContent = data.churchName;
-            }
-            if (data.churchSubtitle) {
-                document.querySelector('.church-subtitle').textContent = data.churchSubtitle;
-            }
-            if (data.volume || data.date || data.pastor) {
-                const dateInfo = document.querySelector('.date-info');
-                dateInfo.textContent = `${data.volume || '제2권 32호'} • ${data.date || '2025년 8월 31일'} • 담임목사 ${data.pastor || '정재화'}`;
-            }
-            
-            // Update worship information
-            if (data.worshipTime || data.worshipLeader) {
-                const worshipHeader = document.querySelector('.worship-order p');
-                worshipHeader.textContent = `${data.worshipTime || '오전 11시'} • 인도자 ${data.worshipLeader || '정재화 목사'}`;
-            }
-            
-            if (data.scripture) {
-                const scriptureElement = document.querySelector('.worship-item:nth-child(11) span:first-child');
-                if (scriptureElement) {
-                    scriptureElement.textContent = `성경봉독 - ${data.scripture}`;
-                }
-            }
-            
-            if (data.sermon) {
-                const sermonElement = document.querySelector('.worship-item:nth-child(12) span:first-child .highlight');
-                if (sermonElement) {
-                    sermonElement.textContent = data.sermon;
-                }
-            }
-            
-            // Update worship items
-            if (data.worshipItems && data.worshipItems.length > 0) {
-                const worshipContainer = document.querySelector('.worship-order');
-                const existingItems = worshipContainer.querySelectorAll('.worship-item');
-                
-                // Remove existing worship items
-                existingItems.forEach(item => item.remove());
-                
-                // Add new worship items
-                data.worshipItems.forEach(item => {
-                    const div = document.createElement('div');
-                    div.className = item.standing ? 'worship-item standing' : 'worship-item';
+            <div class="pdf-two-column">
+                <!-- Left Column - Worship Order -->
+                <div class="pdf-left-column">
+                    <div class="pdf-header">
+                        <h1>*** 주일예배순서 ***</h1>
+                    </div>
                     
-                    const itemText = item.item.includes(data.sermon) ? 
-                        item.item.replace(data.sermon, `<span class="highlight">${data.sermon}</span>`) : 
-                        item.item;
+                    <div class="pdf-worship-info">
+                        <div class="pdf-time">오전 11시</div>
+                        <div class="pdf-leader">인도자 정재화 목사</div>
+                        <div class="pdf-note">※ 모든 일어서서</div>
+                    </div>
                     
-                    div.innerHTML = `
-                        <span>${itemText}</span>
-                        <span>${item.leader}</span>
-                    `;
+                    <div class="pdf-worship-items">
+                        <div class="pdf-worship-item">
+                            <span class="pdf-item-name">경배와 찬양</span>
+                            <span class="pdf-item-dots">--------------------</span>
+                            <span class="pdf-item-leader">다함께</span>
+                        </div>
+                        <div class="pdf-worship-item">
+                            <span class="pdf-item-name">조용한 기도</span>
+                            <span class="pdf-item-dots">------예배로 초대------</span>
+                            <span class="pdf-item-leader">인도자</span>
+                        </div>
+                        <div class="pdf-worship-item">
+                            <span class="pdf-item-name">※찬    송</span>
+                            <span class="pdf-item-dots">-------- 80장 ---------</span>
+                            <span class="pdf-item-leader">다함께</span>
+                        </div>
+                        <div class="pdf-worship-item">
+                            <span class="pdf-item-name">※성시교독</span>
+                            <span class="pdf-item-dots">-------- 74편 --------</span>
+                            <span class="pdf-item-leader">다함께</span>
+                        </div>
+                        <div class="pdf-worship-item">
+                            <span class="pdf-item-name">※신앙고백</span>
+                            <span class="pdf-item-dots">--------------------</span>
+                            <span class="pdf-item-leader">다함께</span>
+                        </div>
+                        <div class="pdf-worship-item">
+                            <span class="pdf-item-name">찬    송</span>
+                            <span class="pdf-item-dots">-------- 427장 --------</span>
+                            <span class="pdf-item-leader">다함께</span>
+                        </div>
+                        <div class="pdf-worship-item">
+                            <span class="pdf-item-name">목회기도</span>
+                            <span class="pdf-item-dots">--------------------</span>
+                            <span class="pdf-item-leader">인도자</span>
+                        </div>
+                        <div class="pdf-worship-item">
+                            <span class="pdf-item-name">교회소식</span>
+                            <span class="pdf-item-dots">------주보와 화면------</span>
+                            <span class="pdf-item-leader">인도자</span>
+                        </div>
+                        <div class="pdf-worship-item">
+                            <span class="pdf-item-name">봉헌기도</span>
+                            <span class="pdf-item-dots">--------------------</span>
+                            <span class="pdf-item-leader">인도자</span>
+                        </div>
+                        <div class="pdf-worship-item">
+                            <span class="pdf-item-name">※성    찬</span>
+                            <span class="pdf-item-dots">---주님의 식탁으로 초대---</span>
+                            <span class="pdf-item-leader">인도자</span>
+                        </div>
+                        <div class="pdf-worship-item">
+                            <span class="pdf-item-name">성경봉독</span>
+                            <span class="pdf-item-dots">--- 요한복음 10장 10절 ---</span>
+                            <span class="pdf-item-leader">다함께</span>
+                        </div>
+                        <div class="pdf-worship-item">
+                            <span class="pdf-item-name">설    교</span>
+                            <span class="pdf-item-dots">--- 진정한 복이란? ---</span>
+                            <span class="pdf-item-leader">인도자</span>
+                        </div>
+                        <div class="pdf-worship-item">
+                            <span class="pdf-item-name">※결단의 기도</span>
+                            <span class="pdf-item-dots">----- 공동기도 --------</span>
+                            <span class="pdf-item-leader">다함께</span>
+                        </div>
+                        <div class="pdf-worship-item">
+                            <span class="pdf-item-name">※파송의 찬양</span>
+                            <span class="pdf-item-dots">---- 십자가 군병들아 ----</span>
+                            <span class="pdf-item-leader">다함께</span>
+                        </div>
+                        <div class="pdf-worship-item">
+                            <span class="pdf-item-name">축    도</span>
+                            <span class="pdf-item-dots">--------------------</span>
+                            <span class="pdf-item-leader">인도자</span>
+                        </div>
+                    </div>
                     
-                    // Insert before the offering notice
-                    const offeringNotice = worshipContainer.querySelector('p[style*="background: #fff3cd"]');
-                    worshipContainer.insertBefore(div, offeringNotice);
-                });
-            }
-            
-            // Update financial information
-            if (data.financialMonth) {
-                const financialTitle = document.querySelector('.section:nth-of-type(3) .section-title');
-                if (financialTitle) {
-                    financialTitle.textContent = `${data.financialMonth} 헌금 내역`;
-                }
-            }
-            
-            if (data.financialItems && data.financialItems.length > 0) {
-                const financialGrid = document.querySelector('.financial-grid');
-                const existingItems = financialGrid.querySelectorAll('.financial-item:not([style*="border: 3px solid"])');
-                
-                // Remove existing financial items (except total)
-                existingItems.forEach(item => item.remove());
-                
-                let total = 0;
-                
-                // Add new financial items
-                data.financialItems.forEach(item => {
-                    const div = document.createElement('div');
-                    div.className = 'financial-item';
-                    div.innerHTML = `
-                        <div>${item.name}</div>
-                        <div class="financial-amount">${item.amount}</div>
-                    `;
+                    <div class="pdf-offering-note">
+                        ✚ 헌금은 들어오시면서 헌금함에 합니다!
+                    </div>
                     
-                    // Calculate total (remove non-numeric characters and convert to number)
-                    const amount = parseInt(item.amount.replace(/[^0-9]/g, '')) || 0;
-                    total += amount;
-                    
-                    // Insert before the total item
-                    const totalItem = financialGrid.querySelector('.financial-item[style*="border: 3px solid"]');
-                    financialGrid.insertBefore(div, totalItem);
-                });
-                
-                // Update total
-                const totalItem = financialGrid.querySelector('.financial-item[style*="border: 3px solid"] .financial-amount');
-                if (totalItem) {
-                    totalItem.textContent = total.toLocaleString() + '원';
-                }
-            }
-            
-            if (data.bankAccount) {
-                const bankAccountElement = document.querySelector('.section:nth-of-type(3) p strong');
-                if (bankAccountElement && bankAccountElement.parentElement) {
-                    bankAccountElement.parentElement.innerHTML = `<strong>헌금계좌:</strong> ${data.bankAccount}`;
-                }
-            }
-            
-            // Update church news
-            if (data.newsItems && data.newsItems.length > 0) {
-                const newsList = document.querySelector('.section:nth-of-type(4) ul');
-                if (newsList) {
-                    newsList.innerHTML = '';
-                    
-                    data.newsItems.forEach(news => {
-                        const li = document.createElement('li');
-                        li.style.cssText = 'margin-bottom: 15px; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #667eea;';
-                        li.textContent = news;
-                        newsList.appendChild(li);
-                    });
-                }
-            }
-            
-            // Update contact information
-            if (data.address) {
-                const addressElement = document.querySelector('.contact-grid .contact-item:nth-child(1) p');
-                if (addressElement) {
-                    addressElement.textContent = data.address;
-                }
-            }
-            
-            if (data.phone) {
-                const phoneElement = document.querySelector('.contact-grid .contact-item:nth-child(2) p');
-                if (phoneElement) {
-                    phoneElement.textContent = `☎ ${data.phone}`;
-                }
-            }
-            
-            if (data.mobile) {
-                const mobileElement = document.querySelector('.contact-grid .contact-item:nth-child(3) p');
-                if (mobileElement) {
-                    mobileElement.textContent = `📱 ${data.mobile}`;
-                }
-            }
-            
-            if (data.established) {
-                const establishedElement = document.querySelector('.contact-grid .contact-item:nth-child(4) p');
-                if (establishedElement) {
-                    establishedElement.textContent = data.established;
-                }
-            }
-        }
-        
-        // Admin login function
-        function adminLogin() {
-            const username = document.getElementById('adminUsername').value;
-            const password = document.getElementById('adminPassword').value;
-            const messageDiv = document.getElementById('adminMessage');
-            
-            // Clear previous messages
-            messageDiv.innerHTML = '';
-            messageDiv.className = '';
-            
-            // Check credentials
-            if (username === 'admin' && password === 'church1234') {
-                messageDiv.innerHTML = '로그인 성공! 관리자 페이지로 이동합니다...';
-                messageDiv.className = 'admin-success';
-                
-                // Redirect to admin page after 1 second
-                setTimeout(() => {
-                    window.open('admin.html', '_blank');
-                    // Clear the form
-                    document.getElementById('adminUsername').value = '';
-                    document.getElementById('adminPassword').value = '';
-                    messageDiv.innerHTML = '';
-                }, 1000);
-            } else {
-                messageDiv.innerHTML = '잘못된 사용자명 또는 비밀번호입니다.';
-                messageDiv.className = 'admin-error';
-                
-                // Clear error message after 3 seconds
-                setTimeout(() => {
-                    messageDiv.innerHTML = '';
-                    messageDiv.className = '';
-                }, 3000);
-            }
-        }
-        
-        // Allow Enter key to submit login
-        document.addEventListener('DOMContentLoaded', function() {
-            const usernameInput = document.getElementById('adminUsername');
-            const passwordInput = document.getElementById('adminPassword');
-            
-            usernameInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    adminLogin();
-                }
-            });
-            
-            passwordInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    adminLogin();
-                }
-            });
-        });
+                    <div class="pdf-bottom-message">
+                        하나님은 당신을 사랑하십니다
+                    </div>
+                </div>
 
-        // Load data when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            loadBulletinData();
-        });
+                <!-- Right Column - Schedules and Finances -->
+                <div class="pdf-right-column">
+                    <!-- Afternoon Service -->
+                    <div class="pdf-schedule-section">
+                        <div class="pdf-schedule-header">오후 2시 30</div>
+                        <div class="pdf-schedule-title">* 주일오후예배 *</div>
+                        <div class="pdf-schedule-content">
+                            <div>찬송</div>
+                            <div>말씀</div>
+                            <div class="pdf-schedule-right">큐티 나눔 시간</div>
+                            <div class="pdf-schedule-right">다함께</div>
+                            <div class="pdf-schedule-right">인도자</div>
+                        </div>
+                    </div>
 
-        function downloadPDF() {
-            const element = document.getElementById('bulletin-content');
-            const button = document.querySelector('.download-btn');
-            
-            // Hide the download button temporarily
-            button.style.display = 'none';
-            
-            // Apply PDF-specific styling temporarily
-            const originalStyle = element.style.cssText;
-            element.style.maxWidth = 'none';
-            element.style.margin = '0';
-            element.style.boxShadow = 'none';
-            element.style.borderRadius = '0';
-            
-            // Get current date for filename
-            const savedData = localStorage.getItem('bulletinData');
-            let filename = '백령감리교회_주보_2025년8월31일.pdf';
-            
-            if (savedData) {
-                const data = JSON.parse(savedData);
-                if (data.date) {
-                    const dateForFilename = data.date.replace(/\s/g, '');
-                    filename = `백령감리교회_주보_${dateForFilename}.pdf`;
-                }
-            }
-            
-            const opt = {
-                margin: [0.5, 0.5, 0.5, 0.5],
-                filename: filename,
-                image: { 
-                    type: 'jpeg', 
-                    quality: 0.98 
-                },
-                html2canvas: { 
-                    scale: 2,
-                    useCORS: true,
-                    letterRendering: true,
-                    allowTaint: true
-                },
-                jsPDF: { 
-                    unit: 'in', 
-                    format: 'a4', 
-                    orientation: 'portrait'
-                },
-                pagebreak: { 
-                    mode: 'css'
-                }
-            };
+                    <!-- Wednesday Service -->
+                    <div class="pdf-schedule-section">
+                        <div class="pdf-schedule-header">오후 7:30</div>
+                        <div class="pdf-schedule-title">*수요성경공부*</div>
+                        <div class="pdf-schedule-content">
+                            <div>찬송</div>
+                            <div>말씀</div>
+                            <div class="pdf-schedule-right">양육교제</div>
+                            <div class="pdf-schedule-right">인도자</div>
+                        </div>
+                    </div>
 
-            html2pdf().set(opt).from(element).save().then(() => {
-                // Restore original styling
-                element.style.cssText = originalStyle;
-                // Show the button again after PDF generation
-                button.style.display = 'flex';
-            }).catch((error) => {
-                console.error('PDF generation failed:', error);
-                // Restore original styling even if PDF generation fails
-                element.style.cssText = originalStyle;
-                button.style.display = 'flex';
-            });
-        }
-    </script>
+                    <!-- Dawn Prayer -->
+                    <div class="pdf-schedule-section">
+                        <div class="pdf-schedule-header">오전 5시</div>
+                        <div class="pdf-schedule-title">* 새벽기도회 * (월~금)</div>
+                        <div class="pdf-schedule-content">
+                            <div>말씀</div>
+                            <div class="pdf-schedule-verse">시편강해</div>
+                            <div class="pdf-schedule-verse">새벽에 하나님이 도우시리라 (시편46:5)</div>
+                            <div class="pdf-schedule-right">인도자</div>
+                        </div>
+                    </div>
+
+                    <!-- Friday Prayer -->
+                    <div class="pdf-schedule-section">
+                        <div class="pdf-schedule-header">오후 8:30</div>
+                        <div class="pdf-schedule-title">* 금요기도회 *</div>
+                        <div class="pdf-schedule-content">
+                            <div class="pdf-schedule-verse">인자야, 내가 너를 이스라엘 족속의 파수꾼으로 세웠으니(겔3:17)</div>
+                            <div class="pdf-schedule-right">인도자</div>
+                        </div>
+                    </div>
+
+                    <!-- Financial Information -->
+                    <div class="pdf-financial-section">
+                        <div class="pdf-financial-header">⚜ 8월 헌금 내역 ⚜</div>
+                        <table class="pdf-financial-table">
+                            <tr>
+                                <td rowspan="5" class="pdf-table-label">예배시간</td>
+                                <td>주일예배</td>
+                                <td>오전 11시</td>
+                                <td rowspan="5" class="pdf-table-label">주일헌금</td>
+                                <td>105,000</td>
+                            </tr>
+                            <tr>
+                                <td>주일오후예배</td>
+                                <td>오후 2시 30</td>
+                                <td>십일조</td>
+                                <td>860,000</td>
+                            </tr>
+                            <tr>
+                                <td>수요성경공부</td>
+                                <td>오후 7:30</td>
+                                <td>감사헌금</td>
+                                <td>785,000</td>
+                            </tr>
+                            <tr>
+                                <td>금요철야기도회</td>
+                                <td>오후 8:30</td>
+                                <td>비전교회 후원금</td>
+                                <td>1,181,000</td>
+                            </tr>
+                            <tr>
+                                <td>새벽기도회</td>
+                                <td>오전 5:00</td>
+                                <td>특별헌금</td>
+                                <td>1,000,000</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="2" class="pdf-table-label">헌금계좌</td>
+                                <td colspan="2">농협 351-1328-3733-53</td>
+                                <td>합계</td>
+                                <td>3,931,000</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">기독교대한감리회 백령교회</td>
+                                <td colspan="2"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page 2 -->
+        <div class="pdf-page">
+            <div class="pdf-date-info">교회설립 2024.10.15. 제2권 32호 2025년 8월 31일</div>
+            
+            <div class="pdf-two-column">
+                <!-- Left Column - Church Notice -->
+                <div class="pdf-left-column">
+                    <div class="pdf-notice-header">
+                        <h2>교회소식</h2>
+                        <p>Church Notice</p>
+                    </div>
+                    
+                    <div class="pdf-notice-content">
+                        <div class="pdf-notice-item">⚜ 오늘 처음 나오신 분들을 주님의 이름으로 환영합니다.</div>
+                        <div class="pdf-notice-item">⚜ 9월 1일 인천내리교회에서 지방 목회자 모임이 있어 출도합니다</div>
+                        <div class="pdf-notice-item">⚜ 저희 교회가 목양, 전도, 군 선교, 북한 선교를 감당할 수 있도록 계속 기도를 드립시다.</div>
+                        <div class="pdf-notice-item">⚜ 이번 주 수요 예배는 집에서 말씀 읽기와 기도로 대신합니다.</div>
+                        <div class="pdf-notice-item">⚜ 백령도에 금주 금연 운동이 일어나도록 기도합시다.</div>
+                    </div>
+
+                    <div class="pdf-invitation-section">
+                        <h3>당신을 초대합니다!</h3>
+                        
+                        <div class="pdf-gospel-box">
+                            <div class="pdf-gospel-item">
+                                <span class="pdf-heart">♥</span>하나님은 당신을 사랑하십니다.
+                                <span class="pdf-cross">✚</span>사람들은 죄인이 되었습니다.
+                            </div>
+                            <div class="pdf-gospel-text">
+                                하나님이 세상을 이처럼 사랑하사 독생자를 주셨으니 이는 그를 믿는 자마다 멸망치 않고 영생을 얻게 하려 하심이라(요한복음 3장 23절)
+                            </div>
+                        </div>
+
+                        <div class="pdf-gospel-box">
+                            <div class="pdf-gospel-item">
+                                <span class="pdf-book">📖</span>구원의 길은 오직 예수 뿐입니다.
+                                <span class="pdf-book">📖</span>예수를 영접함으로 영생을 얻습니다.
+                            </div>
+                            <div class="pdf-gospel-text">
+                                예수께서 이르시되 내가 곧 길이요 진리요 생명이니 나로 말미암지 않고는 아버지께로 올 자가 없느니라(요한복음 14장 6절)
+                            </div>
+                        </div>
+
+                        <div class="pdf-final-invitation">
+                            이 모든 진리가 사실이며 지금, 이 순간도 하나님은 당신을 기다리고 계십니다.
+                            <br><br>
+                            <strong style="color: #e17055;">수고하고 무거운 짐 진 자들아 다 내게로 오라 내가 너희를 쉬게 하리라</strong>
+                            <br><br>
+                            어서 집으로, 주님의 품으로 돌아오시기를 간절히 초청합니다!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Church Info and Contact -->
+                <div class="pdf-right-column">
+                    <div class="pdf-church-image">
+                        <div class="pdf-image-placeholder">
+                            <div class="pdf-image-text">주여<br>저 북녘 땅에 복음의 빛을 비추소서!!!</div>
+                            <div class="pdf-cross-symbol">✚</div>
+                        </div>
+                    </div>
+
+                    <div class="pdf-vision-section">
+                        <div class="pdf-vision-header">백령감리교회 사명</div>
+                        <div class="pdf-vision-subtitle">Vision Jesus Christ</div>
+                        
+                        <div class="pdf-vision-items">
+                            <div class="pdf-vision-item">♡ 백령도 잃어버린 영혼 찾아 제자삼기</div>
+                            <div class="pdf-vision-item">♡ 군선교를 통한 다음세대 준비하기</div>
+                            <div class="pdf-vision-item">♡ 북한통일 꿈꾸며 북한 선교에 헌신하기</div>
+                        </div>
+                    </div>
+
+                    <div class="pdf-church-info">
+                        <div class="pdf-church-logo">
+                            <div class="pdf-logo-circle">
+                                <div class="pdf-logo-text">기독교<br>대한감리회</div>
+                            </div>
+                            <div class="pdf-church-name-large">백령감리교회</div>
+                            <div class="pdf-church-subtitle-eng">METHODIST CHURCH BAENG NYEONG</div>
+                        </div>
+
+                        <div class="pdf-pastor-info">담임목사 정 재 화</div>
+
+                        <div class="pdf-contact-info">
+                            <div class="pdf-address">📍 인천광역시 옹진군 백령면 진촌리 311-3</div>
+                            <div class="pdf-phone">☎ 032) 836-7401 | HP 010-4804-3124</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>

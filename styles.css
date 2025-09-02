@@ -1,0 +1,960 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Malgun Gothic', '맑은 고딕', Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.header {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    color: white;
+    padding: 30px;
+    text-align: center;
+    position: relative;
+}
+
+.header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="cross" patternUnits="userSpaceOnUse" width="20" height="20"><path d="M10 0v20M0 10h20" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23cross)"/></svg>');
+    opacity: 0.3;
+}
+
+.church-name {
+    font-size: 2.5em;
+    font-weight: bold;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+.church-subtitle {
+    font-size: 1.2em;
+    opacity: 0.9;
+    position: relative;
+    z-index: 1;
+}
+
+.date-info {
+    background: #f8f9fa;
+    padding: 15px;
+    text-align: center;
+    border-bottom: 3px solid #e9ecef;
+    font-weight: bold;
+    color: #495057;
+}
+
+.content {
+    padding: 30px;
+}
+
+.section {
+    margin-bottom: 40px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 25px;
+    border-left: 5px solid #667eea;
+}
+
+.section-title {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.section-title::before {
+    content: '✦';
+    margin-right: 10px;
+    color: #667eea;
+}
+
+.worship-order {
+    background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+}
+
+.worship-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.worship-item:last-child {
+    border-bottom: none;
+}
+
+.worship-item.standing {
+    background: linear-gradient(90deg, #fff3cd 0%, transparent 100%);
+    padding: 12px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.worship-item.standing::before {
+    content: '※ ';
+    color: #856404;
+}
+
+.schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.schedule-item {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.schedule-item:hover {
+    border-color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.schedule-time {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #667eea;
+    margin-bottom: 5px;
+}
+
+.schedule-name {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.financial-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.financial-item {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    border: 2px solid #e9ecef;
+}
+
+.financial-amount {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #28a745;
+    margin-top: 5px;
+}
+
+.gospel-invitation {
+    background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+    border-left-color: #e17055;
+    text-align: center;
+}
+
+.gospel-verse {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 15px 0;
+    border-left: 4px solid #e17055;
+    font-style: italic;
+}
+
+.contact-info {
+    background: #2c3e50;
+    color: white;
+    padding: 25px;
+    text-align: center;
+}
+
+.contact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.contact-item {
+    background: rgba(255,255,255,0.1);
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.highlight {
+    background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.download-buttons {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+}
+
+.download-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 140px;
+    justify-content: center;
+}
+
+.download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+}
+
+.download-btn:active {
+    transform: translateY(0);
+}
+
+.pdf-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.word-btn {
+    background: linear-gradient(135deg, #2b5ce6 0%, #1e3a8a 100%);
+}
+
+.word-btn:hover {
+    box-shadow: 0 12px 30px rgba(43, 92, 230, 0.4);
+}
+
+.image-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.image-btn:hover {
+    box-shadow: 0 12px 30px rgba(16, 185, 129, 0.4);
+}
+
+/* Admin login styles */
+.admin-login {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border: 2px solid #e9ecef;
+    z-index: 1000;
+    min-width: 200px;
+}
+
+.admin-login h4 {
+    margin-bottom: 10px;
+    color: #2c3e50;
+    font-size: 14px;
+    text-align: center;
+}
+
+.admin-login input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 8px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.admin-login button {
+    width: 100%;
+    padding: 8px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.admin-login button:hover {
+    background: #5a6fd8;
+}
+
+.admin-error {
+    color: #dc3545;
+    font-size: 11px;
+    margin-top: 5px;
+    text-align: center;
+}
+
+.admin-success {
+    color: #28a745;
+    font-size: 11px;
+    margin-top: 5px;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .admin-login {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        width: auto;
+        min-width: auto;
+    }
+}
+
+/* Picture placeholder styles */
+.pictures-section {
+    background: white;
+}
+
+.picture-placeholder {
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.picture-placeholder:hover {
+    border-color: #667eea;
+    background: #f0f4ff;
+}
+
+.wide-picture {
+    height: 300px;
+    width: 501px;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.logo-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.logo-form {
+    height: 150px;
+    width: 200px;
+}
+
+.placeholder-content {
+    text-align: center;
+    color: #6c757d;
+}
+
+.placeholder-icon {
+    font-size: 3em;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.placeholder-content p {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 1.1em;
+}
+
+.placeholder-content small {
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+/* Image styles */
+.picture-container {
+    margin-bottom: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.picture-container:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.bulletin-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.wide-image {
+    height: 300px;
+    width: 501px;
+    background: white;
+}
+
+.logo-image {
+    height: 150px;
+    object-fit: contain;
+    background: white;
+    padding: 10px;
+}
+
+.picture-container.wide-picture {
+    height: 300px;
+    width: 501px;
+    max-width: 100%;
+    margin: 0 auto 20px auto;
+}
+
+.picture-container.logo-form {
+    height: 150px;
+    width: 200px;
+    background: white;
+    border: 2px solid #e9ecef;
+}
+
+/* PDF-specific styles for landscape layout */
+.pdf-layout {
+    display: none;
+}
+
+.pdf-layout.active {
+    display: block !important;
+    width: 800px;
+    min-height: 600px;
+    margin: 0;
+    padding: 20px;
+    background: #f5f5dc;
+    font-family: 'Malgun Gothic', '맑은 고딕', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.4;
+    box-sizing: border-box;
+    color: #000;
+    position: relative;
+    visibility: visible;
+}
+
+.pdf-page {
+    width: 100%;
+    height: 100%;
+    page-break-after: always;
+    background: #f5f5dc;
+}
+
+.pdf-page:last-child {
+    page-break-after: avoid;
+}
+
+.pdf-date-info {
+    text-align: right;
+    font-size: 12px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #333;
+}
+
+.pdf-two-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    height: calc(100% - 30px);
+}
+
+.pdf-left-column,
+.pdf-right-column {
+    display: flex;
+    flex-direction: column;
+    background: #f5f5dc;
+}
+
+/* Page 1 - Left Column (Worship Order) */
+.pdf-header {
+    text-align: center;
+    margin-bottom: 4mm;
+    padding: 3mm 0;
+    background: #c8c8c8;
+    border-radius: 2px;
+}
+
+.pdf-header h1 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #000080;
+    margin: 0;
+}
+
+.pdf-worship-info {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 14px;
+    line-height: 1.2;
+}
+
+.pdf-time {
+    font-weight: bold;
+    margin-bottom: 1mm;
+}
+
+.pdf-leader {
+    margin-bottom: 1mm;
+}
+
+.pdf-note {
+    font-size: 8px;
+    color: #666;
+}
+
+.pdf-worship-items {
+    flex: 1;
+    margin-bottom: 3mm;
+}
+
+.pdf-worship-item {
+    display: flex;
+    align-items: center;
+    padding: 3px 0;
+    border-bottom: 1px dotted #999;
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+.pdf-worship-item:last-child {
+    border-bottom: none;
+}
+
+.pdf-item-name {
+    width: 25mm;
+    text-align: left;
+    flex-shrink: 0;
+}
+
+.pdf-item-dots {
+    flex: 1;
+    text-align: center;
+    font-family: monospace;
+    color: #666;
+    font-size: 7px;
+}
+
+.pdf-item-leader {
+    width: 15mm;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.pdf-offering-note {
+    text-align: center;
+    padding: 2mm;
+    background: #fff3cd;
+    border-radius: 2px;
+    font-weight: bold;
+    color: #856404;
+    font-size: 8px;
+    margin-bottom: 2mm;
+}
+
+.pdf-bottom-message {
+    text-align: center;
+    font-size: 11px;
+    font-weight: bold;
+    color: #000080;
+    margin-top: auto;
+}
+
+/* Page 1 - Right Column (Schedules & Finances) */
+.pdf-schedule-section {
+    margin-bottom: 3mm;
+    background: #e6e6fa;
+    border-radius: 2px;
+    padding: 2mm;
+}
+
+.pdf-schedule-header {
+    background: #c8c8c8;
+    text-align: center;
+    padding: 1.5mm;
+    font-weight: bold;
+    font-size: 9px;
+    border-radius: 2px;
+    margin-bottom: 1mm;
+}
+
+.pdf-schedule-title {
+    text-align: center;
+    font-weight: bold;
+    color: #000080;
+    font-size: 9px;
+    margin-bottom: 1mm;
+}
+
+.pdf-schedule-content {
+    font-size: 8px;
+    line-height: 1.2;
+}
+
+.pdf-schedule-content div {
+    margin-bottom: 0.5mm;
+}
+
+.pdf-schedule-right {
+    text-align: right;
+}
+
+.pdf-schedule-verse {
+    font-style: italic;
+    color: #666;
+    font-size: 7px;
+}
+
+.pdf-financial-section {
+    margin-top: 3mm;
+    background: #e6e6fa;
+    padding: 2mm;
+    border-radius: 2px;
+}
+
+.pdf-financial-header {
+    text-align: center;
+    font-weight: bold;
+    color: #000080;
+    font-size: 9px;
+    margin-bottom: 2mm;
+    background: #c8c8c8;
+    padding: 1.5mm;
+    border-radius: 2px;
+}
+
+.pdf-financial-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 7px;
+    background: white;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.pdf-financial-table td {
+    border: 1px solid #666;
+    padding: 1mm;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.pdf-table-label {
+    background: #d3d3d3;
+    font-weight: bold;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    width: 8mm;
+}
+
+/* Page 2 - Left Column (Church Notice & Gospel) */
+.pdf-notice-header {
+    text-align: center;
+    margin-bottom: 3mm;
+    padding: 2mm;
+    background: #c8c8c8;
+    border-radius: 2px;
+}
+
+.pdf-notice-header h2 {
+    font-size: 12px;
+    font-weight: bold;
+    color: #000080;
+    margin: 0 0 1mm 0;
+}
+
+.pdf-notice-header p {
+    font-size: 8px;
+    margin: 0;
+    color: #666;
+}
+
+.pdf-notice-content {
+    background: #e6e6fa;
+    padding: 2mm;
+    border-radius: 2px;
+    margin-bottom: 3mm;
+}
+
+.pdf-notice-item {
+    font-size: 8px;
+    line-height: 1.3;
+    margin-bottom: 1.5mm;
+    padding: 1mm;
+    background: white;
+    border-radius: 1mm;
+}
+
+.pdf-notice-item:last-child {
+    margin-bottom: 0;
+}
+
+.pdf-invitation-section {
+    flex: 1;
+    background: #fff8dc;
+    padding: 2mm;
+    border-radius: 2px;
+}
+
+.pdf-invitation-section h3 {
+    text-align: center;
+    font-size: 11px;
+    font-weight: bold;
+    color: #8b4513;
+    margin: 0 0 2mm 0;
+}
+
+.pdf-gospel-box {
+    background: white;
+    padding: 2mm;
+    margin-bottom: 2mm;
+    border-radius: 2px;
+    border: 1px solid #ddd;
+}
+
+.pdf-gospel-item {
+    font-size: 8px;
+    line-height: 1.3;
+    margin-bottom: 1mm;
+}
+
+.pdf-heart, .pdf-cross, .pdf-book {
+    color: #e17055;
+    font-weight: bold;
+    margin-right: 1mm;
+}
+
+.pdf-gospel-text {
+    font-size: 7px;
+    font-style: italic;
+    color: #666;
+    line-height: 1.2;
+}
+
+.pdf-final-invitation {
+    text-align: center;
+    font-size: 8px;
+    line-height: 1.3;
+    color: #333;
+    margin-top: 2mm;
+}
+
+/* Page 2 - Right Column (Church Info & Contact) */
+.pdf-church-image {
+    height: 40mm;
+    background: #e6e6fa;
+    border-radius: 2px;
+    margin-bottom: 3mm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pdf-image-placeholder {
+    text-align: center;
+    color: #666;
+    position: relative;
+}
+
+.pdf-image-text {
+    font-size: 9px;
+    font-weight: bold;
+    line-height: 1.2;
+    margin-bottom: 2mm;
+}
+
+.pdf-cross-symbol {
+    font-size: 16px;
+    color: #8b4513;
+}
+
+.pdf-vision-section {
+    background: #fff8dc;
+    padding: 2mm;
+    border-radius: 2px;
+    margin-bottom: 3mm;
+}
+
+.pdf-vision-header {
+    text-align: center;
+    font-size: 10px;
+    font-weight: bold;
+    color: #8b4513;
+    margin-bottom: 1mm;
+}
+
+.pdf-vision-subtitle {
+    text-align: center;
+    font-size: 8px;
+    font-style: italic;
+    color: #666;
+    margin-bottom: 2mm;
+}
+
+.pdf-vision-items {
+    font-size: 7px;
+    line-height: 1.3;
+}
+
+.pdf-vision-item {
+    margin-bottom: 1mm;
+    color: #333;
+}
+
+.pdf-church-info {
+    background: #e6e6fa;
+    padding: 2mm;
+    border-radius: 2px;
+    text-align: center;
+    margin-top: auto;
+}
+
+.pdf-church-logo {
+    margin-bottom: 2mm;
+}
+
+.pdf-logo-circle {
+    width: 20mm;
+    height: 20mm;
+    border: 2px solid #000080;
+    border-radius: 50%;
+    margin: 0 auto 2mm auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+}
+
+.pdf-logo-text {
+    font-size: 6px;
+    font-weight: bold;
+    color: #000080;
+    text-align: center;
+    line-height: 1.1;
+}
+
+.pdf-church-name-large {
+    font-size: 12px;
+    font-weight: bold;
+    color: #000080;
+    margin-bottom: 1mm;
+}
+
+.pdf-church-subtitle-eng {
+    font-size: 7px;
+    color: #666;
+    margin-bottom: 2mm;
+}
+
+.pdf-pastor-info {
+    font-size: 9px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 2mm;
+}
+
+.pdf-contact-info {
+    font-size: 7px;
+    line-height: 1.3;
+    color: #333;
+}
+
+.pdf-address {
+    margin-bottom: 1mm;
+}
+
+.pdf-phone {
+    font-weight: bold;
+}
+
+/* Print-specific adjustments */
+@media print {
+    .pdf-layout {
+        display: block !important;
+    }
+    
+    .pdf-layout.active {
+        width: 297mm;
+        height: 210mm;
+        margin: 0;
+        padding: 8mm;
+    }
+    
+    body {
+        background: white;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .container, .download-btn, .admin-login {
+        display: none !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .download-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        top: auto;
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+    
+    .container {
+        margin: 10px;
+        border-radius: 10px;
+    }
+    
+    .church-name {
+        font-size: 2em;
+    }
+    
+    .content {
+        padding: 20px;
+    }
+    
+    .section {
+        padding: 20px;
+    }
+}

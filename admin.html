@@ -277,6 +277,7 @@
         <div class="header">
             <h1>백령감리교회 주보 관리자</h1>
             <p>주보 내용을 수정하고 관리하세요</p>
+            <button onclick="adminLogout()" style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 12px;">로그아웃</button>
         </div>
 
         <div class="content">
@@ -408,6 +409,61 @@
     </div>
 
     <script>
+        // Security check - redirect if not authenticated
+        function checkAuthentication() {
+            const isAuthenticated = sessionStorage.getItem('adminAuthenticated');
+            const authTime = sessionStorage.getItem('adminAuthTime');
+            const currentTime = new Date().getTime();
+            
+            // Check if user is authenticated and session is still valid (1 hour)
+            if (!isAuthenticated || !authTime || (currentTime - parseInt(authTime)) > 3600000) {
+                // Clear any existing session data
+                sessionStorage.removeItem('adminAuthenticated');
+                sessionStorage.removeItem('adminAuthTime');
+                
+                // Redirect to main page
+                alert('관리자 권한이 필요합니다. 메인 페이지에서 로그인해주세요.');
+                window.location.href = 'index.html';
+                return false;
+            }
+            return true;
+        }
+        
+        // Check authentication when page loads
+        if (!checkAuthentication()) {
+            // Stop script execution if not authenticated
+            throw new Error('Unauthorized access');
+        }
+        
+        // Add logout functionality
+        function adminLogout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                sessionStorage.removeItem('adminAuthenticated');
+                sessionStorage.removeItem('adminAuthTime');
+                alert('로그아웃되었습니다.');
+                window.location.href = 'index.html';
+            }
+        }
+        
+        // Auto-logout after 1 hour of inactivity
+        let inactivityTimer;
+        
+        function resetInactivityTimer() {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(() => {
+                alert('세션이 만료되었습니다. 다시 로그인해주세요.');
+                adminLogout();
+            }, 3600000); // 1 hour
+        }
+        
+        // Reset timer on user activity
+        document.addEventListener('mousemove', resetInactivityTimer);
+        document.addEventListener('keypress', resetInactivityTimer);
+        document.addEventListener('click', resetInactivityTimer);
+        
+        // Start the inactivity timer
+        resetInactivityTimer();
+
         // 초기 데이터
         const initialWorshipItems = [
             { item: "경배와 찬양", leader: "다함께", standing: false },
