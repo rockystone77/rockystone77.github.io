@@ -940,8 +940,10 @@ async function testSingleImage() {
     }
 }
 
-// Download as Word document
-function downloadWord() {
+// Enhanced Word document generation with proper formatting and images
+async function downloadWord() {
+    console.log('🚀 Starting Word document generation...');
+    
     const regularContent = document.getElementById('bulletin-content');
     const pdfLayout = document.getElementById('pdf-layout');
     const buttons = document.querySelector('.download-buttons');
@@ -951,69 +953,222 @@ function downloadWord() {
         return;
     }
     
-    // Hide the download buttons temporarily
-    buttons.style.display = 'none';
-    
-    // Hide regular content and show PDF layout
-    regularContent.style.display = 'none';
-    pdfLayout.classList.add('active');
-    
-    // Update PDF layout with current data
-    updatePDFLayout();
-    
-    // Create Word document content
-    const wordContent = `
-        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-        <head>
-            <meta charset='utf-8'>
-            <title>백령감리교회 주보</title>
-            <style>
-                @page {
-                    size: A4 landscape;
-                    margin: 1in;
-                }
-                body {
-                    font-family: '맑은 고딕', 'Malgun Gothic', Arial, sans-serif;
-                    background-color: #f5f5dc;
-                    margin: 0;
-                    padding: 20px;
-                }
-                .pdf-layout { display: block !important; }
-                .pdf-two-column { display: flex; gap: 20px; }
-                .pdf-left-column, .pdf-right-column { flex: 1; }
-                .pdf-header { background: #c8c8c8; padding: 10px; text-align: center; margin-bottom: 15px; }
-                .pdf-worship-item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px dotted #999; }
-                .pdf-financial-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-                .pdf-financial-table td { border: 1px solid #666; padding: 5px; text-align: center; }
-                .pdf-notice-item { margin: 10px 0; padding: 8px; background: white; border-radius: 4px; }
-            </style>
-        </head>
-        <body>
-            ${pdfLayout.innerHTML}
-        </body>
-        </html>
-    `;
-    
-    // Create blob and download
-    const blob = new Blob([wordContent], {
-        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    });
-    
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = '백령감리교회_주보.doc';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    // Restore original layout
-    pdfLayout.classList.remove('active');
-    regularContent.style.display = 'block';
-    buttons.style.display = 'flex';
-    
-    console.log('Word document generated successfully');
+    try {
+        // Hide the download buttons temporarily
+        buttons.style.display = 'none';
+        
+        // Hide regular content and show PDF layout
+        regularContent.style.display = 'none';
+        pdfLayout.style.display = 'block';
+        pdfLayout.style.visibility = 'visible';
+        pdfLayout.classList.add('active');
+        
+        // Update PDF layout with current data
+        updatePDFLayout();
+        
+        // Add images to layout for Word document
+        console.log('📸 Adding images for Word document...');
+        await addImagesToPDFLayout();
+        
+        // Wait for images to load
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Convert images to base64 for embedding in Word document
+        const images = pdfLayout.querySelectorAll('img');
+        const imagePromises = Array.from(images).map(async (img) => {
+            try {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = img.naturalWidth || img.width;
+                canvas.height = img.naturalHeight || img.height;
+                
+                // For Word documents, we can try canvas conversion since it's not going through html2pdf
+                ctx.drawImage(img, 0, 0);
+                const base64 = canvas.toDataURL('image/png');
+                img.src = base64;
+                console.log(`✅ Converted image to base64 for Word: ${img.alt}`);
+                return true;
+            } catch (error) {
+                console.warn(`⚠️ Could not convert image ${img.alt}:`, error);
+                return false;
+            }
+        });
+        
+        await Promise.all(imagePromises);
+        
+        // Create enhanced Word document content with proper formatting
+        const wordContent = `
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+                  xmlns:w='urn:schemas-microsoft-com:office:word' 
+                  xmlns='http://www.w3.org/TR/REC-html40'>
+            <head>
+                <meta charset='utf-8'>
+                <title>백령감리교회 주보</title>
+                <!--[if gte mso 9]>
+                <xml>
+                    <w:WordDocument>
+                        <w:View>Print</w:View>
+                        <w:Zoom>90</w:Zoom>
+                        <w:DoNotPromptForConvert/>
+                        <w:DoNotShowInsertionsAndDeletions/>
+                    </w:WordDocument>
+                </xml>
+                <![endif]-->
+                <style>
+                    @page {
+                        size: A4 landscape;
+                        margin: 0.5in;
+                        mso-page-orientation: landscape;
+                    }
+                    
+                    body {
+                        font-family: '맑은 고딕', 'Malgun Gothic', Arial, sans-serif;
+                        font-size: 11pt;
+                        line-height: 1.2;
+                        margin: 0;
+                        padding: 10px;
+                        background-color: #f5f5dc;
+                        mso-line-height-rule: exactly;
+                    }
+                    
+                    .pdf-layout { 
+                        display: block !important; 
+                        width: 100%;
+                    }
+                    
+                    .pdf-two-column { 
+                        display: table !important;
+                        width: 100%;
+                        table-layout: fixed;
+                    }
+                    
+                    .pdf-left-column, .pdf-right-column { 
+                        display: table-cell !important;
+                        width: 50%;
+                        vertical-align: top;
+                        padding: 0 10px;
+                    }
+                    
+                    .pdf-header { 
+                        background: #c8c8c8; 
+                        padding: 8px; 
+                        text-align: center; 
+                        margin-bottom: 10px;
+                        border: 1px solid #999;
+                        font-weight: bold;
+                    }
+                    
+                    .pdf-worship-item { 
+                        display: table !important;
+                        width: 100%;
+                        padding: 3px 0; 
+                        border-bottom: 1px dotted #999;
+                        margin-bottom: 2px;
+                    }
+                    
+                    .pdf-worship-item span:first-child {
+                        display: table-cell;
+                        width: 70%;
+                    }
+                    
+                    .pdf-worship-item span:last-child {
+                        display: table-cell;
+                        width: 30%;
+                        text-align: right;
+                    }
+                    
+                    .pdf-financial-table { 
+                        width: 100%; 
+                        border-collapse: collapse; 
+                        margin: 8px 0;
+                        border: 1px solid #666;
+                    }
+                    
+                    .pdf-financial-table td { 
+                        border: 1px solid #666; 
+                        padding: 4px; 
+                        text-align: center;
+                        font-size: 10pt;
+                    }
+                    
+                    .pdf-notice-item { 
+                        margin: 8px 0; 
+                        padding: 6px; 
+                        background: white; 
+                        border: 1px solid #ddd;
+                        border-radius: 3px;
+                    }
+                    
+                    .pdf-image-page {
+                        page-break-before: always;
+                        text-align: center;
+                        padding: 20px;
+                    }
+                    
+                    .pdf-image-page img {
+                        max-width: 100%;
+                        max-height: 500px;
+                        height: auto;
+                        border: 1px solid #ccc;
+                    }
+                    
+                    .pdf-image-page h2 {
+                        font-size: 16pt;
+                        margin-bottom: 15px;
+                        color: #333;
+                    }
+                    
+                    h1, h2, h3 {
+                        color: #333;
+                        margin-top: 10px;
+                        margin-bottom: 8px;
+                    }
+                    
+                    p {
+                        margin: 4px 0;
+                    }
+                    
+                    /* Print-specific styles */
+                    @media print {
+                        body { background: white; }
+                        .pdf-layout { background: white; }
+                    }
+                </style>
+            </head>
+            <body>
+                ${pdfLayout.innerHTML}
+            </body>
+            </html>
+        `;
+        
+        // Create blob with proper MIME type for Word
+        const blob = new Blob([wordContent], {
+            type: 'application/msword'
+        });
+        
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = '백령감리교회_주보_완전판.doc';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        console.log('✅ Enhanced Word document generated successfully with images and proper formatting');
+        alert('📄 Word 문서가 성공적으로 생성되었습니다!\n\n✅ 이미지 포함\n✅ 향상된 서식\n✅ 인쇄 최적화');
+        
+    } catch (error) {
+        console.error('❌ Error generating Word document:', error);
+        alert(`Word 문서 생성 중 오류가 발생했습니다: ${error.message}`);
+    } finally {
+        // Restore original layout
+        pdfLayout.classList.remove('active');
+        pdfLayout.style.display = 'none';
+        pdfLayout.style.visibility = 'hidden';
+        regularContent.style.display = 'block';
+        buttons.style.display = 'flex';
+    }
 }
 
 // Download as Image
