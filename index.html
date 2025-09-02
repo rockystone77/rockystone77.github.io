@@ -257,6 +257,118 @@
             font-size: 18px;
         }
 
+        /* Picture placeholder styles */
+        .pictures-section {
+            background: white;
+        }
+
+        .picture-placeholder {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .picture-placeholder:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .wide-picture {
+            height: 200px;
+            width: 100%;
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .logo-form {
+            height: 150px;
+            width: 200px;
+        }
+
+        .placeholder-content {
+            text-align: center;
+            color: #6c757d;
+        }
+
+        .placeholder-icon {
+            font-size: 3em;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .placeholder-content p {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 1.1em;
+        }
+
+        .placeholder-content small {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        /* PDF-specific styles for 4-page layout */
+        @media print {
+            body {
+                background: white !important;
+                padding: 0 !important;
+            }
+            
+            .container {
+                max-width: none !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+            }
+            
+            /* Page 1: Header + Worship Order */
+            .worship-order {
+                page-break-after: always;
+            }
+            
+            /* Page 2: Schedule + Financial (combined) */
+            .section:nth-of-type(3) {
+                page-break-after: always;
+            }
+            
+            /* Page 3: Church News + Gospel Invitation (combined) */
+            .gospel-invitation {
+                page-break-after: always;
+            }
+            
+            /* Page 4: Contact Info */
+            .contact-info {
+                page-break-before: auto;
+            }
+            
+            .section {
+                margin-bottom: 20px !important;
+                padding: 15px !important;
+            }
+            
+            .content {
+                padding: 15px !important;
+            }
+            
+            .header {
+                padding: 20px !important;
+            }
+            
+            .date-info {
+                padding: 10px !important;
+            }
+        }
+
         @media (max-width: 768px) {
             .download-btn {
                 position: fixed;
@@ -501,6 +613,40 @@
             </div>
         </div>
 
+        <div class="pictures-section">
+            <div class="content">
+                <div class="section">
+                    <h2 class="section-title">사진 및 로고</h2>
+                    
+                    <div class="picture-placeholder wide-picture">
+                        <div class="placeholder-content">
+                            <span class="placeholder-icon">🖼️</span>
+                            <p>첫 번째 사진 (가로형)</p>
+                            <small>이곳에 교회 활동 사진을 추가하세요</small>
+                        </div>
+                    </div>
+                    
+                    <div class="picture-placeholder wide-picture">
+                        <div class="placeholder-content">
+                            <span class="placeholder-icon">🖼️</span>
+                            <p>두 번째 사진 (가로형)</p>
+                            <small>이곳에 교회 활동 사진을 추가하세요</small>
+                        </div>
+                    </div>
+                    
+                    <div class="logo-container">
+                        <div class="picture-placeholder logo-form">
+                            <div class="placeholder-content">
+                                <span class="placeholder-icon">🏛️</span>
+                                <p>교회 로고</p>
+                                <small>교회 로고나 상징을 추가하세요</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="contact-info">
             <h2 style="margin-bottom: 20px;">교회 연락처</h2>
             <div class="contact-grid">
@@ -532,24 +678,45 @@
             // Hide the download button temporarily
             button.style.display = 'none';
             
+            // Apply PDF-specific styling temporarily
+            const originalStyle = element.style.cssText;
+            element.style.maxWidth = 'none';
+            element.style.margin = '0';
+            element.style.boxShadow = 'none';
+            element.style.borderRadius = '0';
+            
             const opt = {
-                margin: 0.5,
+                margin: [0.5, 0.5, 0.5, 0.5],
                 filename: '백령감리교회_주보_2025년8월31일.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
+                image: { 
+                    type: 'jpeg', 
+                    quality: 0.98 
+                },
                 html2canvas: { 
                     scale: 2,
                     useCORS: true,
-                    letterRendering: true
+                    letterRendering: true,
+                    allowTaint: true
                 },
                 jsPDF: { 
                     unit: 'in', 
                     format: 'a4', 
-                    orientation: 'portrait' 
+                    orientation: 'portrait'
+                },
+                pagebreak: { 
+                    mode: 'css'
                 }
             };
 
             html2pdf().set(opt).from(element).save().then(() => {
+                // Restore original styling
+                element.style.cssText = originalStyle;
                 // Show the button again after PDF generation
+                button.style.display = 'flex';
+            }).catch((error) => {
+                console.error('PDF generation failed:', error);
+                // Restore original styling even if PDF generation fails
+                element.style.cssText = originalStyle;
                 button.style.display = 'flex';
             });
         }
