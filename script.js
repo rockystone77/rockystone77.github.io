@@ -350,22 +350,24 @@ function updatePDFLayout() {
     }
 }
 
-// Enhanced PDF download function with comprehensive debugging
+// Enhanced PDF download function with comprehensive debugging and improved compatibility
 async function downloadPDF() {
-    console.log(`\n🚀 STARTING PDF GENERATION`);
-    console.log(`============================`);
+    console.log(`\n🚀 STARTING ENHANCED PDF GENERATION`);
+    console.log(`====================================`);
     
     const regularContent = document.getElementById('bulletin-content');
     const pdfLayout = document.getElementById('pdf-layout');
     const buttons = document.querySelector('.download-buttons');
     const adminLogin = document.querySelector('.admin-login');
     
-    // Pre-flight checks
+    // Pre-flight checks with enhanced validation
     console.log(`🔍 Pre-flight element checks:`);
     console.log(`   - Regular content: ${regularContent ? '✅ Found' : '❌ Missing'}`);
     console.log(`   - PDF layout: ${pdfLayout ? '✅ Found' : '❌ Missing'}`);
     console.log(`   - Buttons: ${buttons ? '✅ Found' : '❌ Missing'}`);
     console.log(`   - Admin login: ${adminLogin ? '✅ Found' : '❌ Missing'}`);
+    console.log(`   - Browser: ${navigator.userAgent.includes('Chrome') ? '✅ Chrome' : '⚠️ ' + navigator.userAgent.split(' ').pop()}`);
+    console.log(`   - Protocol: ${window.location.protocol}`);
     
     if (!regularContent || !pdfLayout || !buttons) {
         console.error('❌ Required elements not found for PDF generation');
@@ -376,8 +378,8 @@ async function downloadPDF() {
     const startTime = performance.now();
     
     try {
-        // Step 1: Prepare layout
-        console.log(`\n📋 Step 1: Preparing layout...`);
+        // Step 1: Enhanced layout preparation with CSS compatibility fixes
+        console.log(`\n📋 Step 1: Enhanced layout preparation...`);
         buttons.style.display = 'none';
         if (adminLogin) adminLogin.style.display = 'none';
         
@@ -386,56 +388,142 @@ async function downloadPDF() {
         pdfLayout.style.visibility = 'visible';
         pdfLayout.classList.add('active');
         
+        // Apply PDF-specific CSS fixes for better compatibility
+        console.log(`🎨 Applying PDF-specific CSS compatibility fixes...`);
+        const pdfStyleFixes = document.createElement('style');
+        pdfStyleFixes.id = 'pdf-compatibility-fixes';
+        pdfStyleFixes.textContent = `
+            /* Enhanced PDF compatibility fixes */
+            .pdf-layout.active {
+                font-family: 'Arial', 'Helvetica', sans-serif !important;
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            
+            .pdf-two-column {
+                display: table !important;
+                width: 100% !important;
+                table-layout: fixed !important;
+                border-spacing: 0 !important;
+                border-collapse: separate !important;
+            }
+            
+            .pdf-left-column, .pdf-right-column {
+                display: table-cell !important;
+                vertical-align: top !important;
+                width: 50% !important;
+                padding: 0 10px !important;
+                box-sizing: border-box !important;
+            }
+            
+            .pdf-financial-table {
+                border-collapse: collapse !important;
+                width: 100% !important;
+                table-layout: fixed !important;
+            }
+            
+            .pdf-financial-table td {
+                border: 1px solid #000 !important;
+                padding: 2px !important;
+                text-align: center !important;
+                font-size: 7px !important;
+                line-height: 1.1 !important;
+                word-wrap: break-word !important;
+            }
+            
+            /* Remove problematic CSS properties for PDF */
+            .pdf-layout * {
+                box-shadow: none !important;
+                text-shadow: none !important;
+                filter: none !important;
+                transform: none !important;
+                transition: none !important;
+                animation: none !important;
+            }
+            
+            /* Ensure backgrounds are preserved */
+            .pdf-layout .pdf-header,
+            .pdf-layout .pdf-schedule-section,
+            .pdf-layout .pdf-financial-section,
+            .pdf-layout .pdf-notice-content,
+            .pdf-layout .pdf-invitation-section {
+                background-color: #e6e6fa !important;
+                -webkit-print-color-adjust: exact !important;
+            }
+        `;
+        document.head.appendChild(pdfStyleFixes);
+        
         // Force layout recalculation and log dimensions
         pdfLayout.offsetHeight;
         console.log(`   - PDF layout dimensions: ${pdfLayout.scrollWidth}x${pdfLayout.scrollHeight}`);
         console.log(`   - PDF layout visible: ${pdfLayout.style.display === 'block' ? '✅' : '❌'}`);
+        console.log(`   - CSS fixes applied: ✅`);
         
         // Step 2: Update PDF layout with current data
         console.log(`\n📝 Step 2: Updating PDF layout with current data...`);
         updatePDFLayout();
         console.log(`   - Layout update completed`);
         
-        // Step 3: Skip images to avoid canvas tainting - generate text-only PDF
-        console.log(`\n🖼️ Step 3: Skipping images to avoid canvas tainting...`);
+        // Step 3: Enhanced font and resource validation
+        console.log(`\n🔤 Step 3: Font and resource validation...`);
+        const computedStyle = window.getComputedStyle(pdfLayout);
+        console.log(`   - Computed font family: ${computedStyle.fontFamily}`);
+        console.log(`   - Font size: ${computedStyle.fontSize}`);
+        console.log(`   - Background color: ${computedStyle.backgroundColor}`);
+        
+        // Check for web fonts and provide fallbacks
+        if (computedStyle.fontFamily.includes('Malgun Gothic')) {
+            console.log(`   - Korean font detected: ✅`);
+        } else {
+            console.log(`   - Using fallback font: ⚠️`);
+        }
+        
+        // Step 4: Skip images to avoid canvas tainting - generate text-only PDF
+        console.log(`\n🖼️ Step 4: Image handling strategy...`);
+        console.log(`   - Strategy: Skip images to prevent canvas tainting`);
         console.log(`   - Images will be excluded from PDF to prevent SecurityError`);
         console.log(`   - Use separate image download for pictures`);
         
-        // Step 4: Final preparation
-        console.log(`\n⏳ Step 4: Final preparation (2 second wait)...`);
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Step 5: Enhanced preparation with timing
+        console.log(`\n⏳ Step 5: Enhanced preparation (3 second wait for stability)...`);
+        await new Promise(resolve => setTimeout(resolve, 3000));
         
-        // Step 5: Validate content before PDF generation
-        console.log(`\n🔍 Step 5: Pre-generation validation...`);
+        // Step 6: Comprehensive pre-generation validation
+        console.log(`\n🔍 Step 6: Comprehensive pre-generation validation...`);
         const imagePages = pdfLayout.querySelectorAll('.pdf-image-page');
         const textContent = pdfLayout.textContent.trim();
+        const tables = pdfLayout.querySelectorAll('table');
+        const tableRows = pdfLayout.querySelectorAll('tr');
+        
         console.log(`   - Image pages found: ${imagePages.length}`);
         console.log(`   - Text content length: ${textContent.length} characters`);
+        console.log(`   - Tables found: ${tables.length}`);
+        console.log(`   - Table rows found: ${tableRows.length}`);
         console.log(`   - Has meaningful content: ${textContent.length > 100 ? '✅' : '❌'}`);
         
-        // Log all images in the layout for debugging
-        const allImages = pdfLayout.querySelectorAll('img');
-        console.log(`   - Total images in layout: ${allImages.length}`);
-        allImages.forEach((img, index) => {
-            console.log(`     ${index + 1}. ${img.src.substring(0, 50)}... (${img.naturalWidth}x${img.naturalHeight})`);
+        // Validate table structure
+        tables.forEach((table, index) => {
+            const cells = table.querySelectorAll('td');
+            console.log(`   - Table ${index + 1}: ${cells.length} cells`);
         });
         
-        // Step 6: Configure PDF generation options (text-only, no images)
-        console.log(`\n⚙️ Step 6: Configuring PDF generation options (text-only)...`);
+        // Step 7: MAXIMUM QUALITY PDF generation options
+        console.log(`\n⚙️ Step 7: Configuring MAXIMUM QUALITY PDF generation options...`);
         const opt = {
-            margin: [10, 10, 10, 10],
-            filename: '백령감리교회_주보.pdf',
+            margin: [5, 5, 5, 5],  // Reduced margins for more content space
+            filename: '백령감리교회_주보_최고품질.pdf',
             image: { 
-                type: 'jpeg', 
-                quality: 0.8 
+                type: 'png',  // PNG for better quality than JPEG
+                quality: 1.0  // Maximum quality
             },
             html2canvas: { 
-                scale: 1.2,
+                scale: 3.0,  // MAXIMUM scale for ultra-high quality (3x resolution)
                 useCORS: false,  // Disable CORS completely
                 allowTaint: false,  // Prevent canvas tainting
-                letterRendering: true,
+                letterRendering: true,  // Better text rendering
                 backgroundColor: '#f5f5dc',
-                logging: true,
+                logging: false,  // Reduce console noise
                 width: pdfLayout.scrollWidth,
                 height: pdfLayout.scrollHeight,
                 scrollX: 0,
@@ -444,35 +532,92 @@ async function downloadPDF() {
                 proxy: undefined,
                 removeContainer: true,
                 imageTimeout: 0,  // Skip image processing entirely
+                dpi: 300,  // High DPI for print quality
+                windowWidth: 1920,  // High resolution window width
+                windowHeight: 1080,  // High resolution window height
+                x: 0,
+                y: 0,
+                onclone: function(clonedDoc) {
+                    // Apply maximum quality fixes to cloned document
+                    const clonedLayout = clonedDoc.querySelector('.pdf-layout');
+                    if (clonedLayout) {
+                        // Enhanced font rendering
+                        clonedLayout.style.fontFamily = 'Arial, sans-serif';
+                        clonedLayout.style.fontSize = '14px';  // Slightly larger for better readability
+                        clonedLayout.style.lineHeight = '1.3';  // Better line spacing
+                        clonedLayout.style.fontWeight = '400';  // Standard weight
+                        clonedLayout.style.textRendering = 'optimizeLegibility';
+                        clonedLayout.style.webkitFontSmoothing = 'antialiased';
+                        clonedLayout.style.mozOsxFontSmoothing = 'grayscale';
+                        
+                        // Enhance all text elements
+                        const allTextElements = clonedLayout.querySelectorAll('*');
+                        allTextElements.forEach(el => {
+                            el.style.textRendering = 'optimizeLegibility';
+                            el.style.webkitFontSmoothing = 'antialiased';
+                            el.style.mozOsxFontSmoothing = 'grayscale';
+                        });
+                        
+                        // Enhance table rendering
+                        const tables = clonedLayout.querySelectorAll('table');
+                        tables.forEach(table => {
+                            table.style.borderCollapse = 'collapse';
+                            table.style.borderSpacing = '0';
+                            const cells = table.querySelectorAll('td, th');
+                            cells.forEach(cell => {
+                                cell.style.border = '1px solid #000';
+                                cell.style.padding = '3px';
+                                cell.style.fontSize = '8px';
+                                cell.style.lineHeight = '1.2';
+                            });
+                        });
+                    }
+                },
                 ignoreElements: function(element) {
-                    // Ignore all images and problematic elements
-                    return element.tagName === 'IMG' ||
-                           element.classList.contains('download-buttons') || 
-                           element.classList.contains('admin-login') ||
-                           element.classList.contains('pdf-image-page');
+                    // Enhanced element filtering for maximum quality
+                    const tagName = element.tagName;
+                    const classList = element.classList;
+                    
+                    return tagName === 'IMG' ||
+                           tagName === 'CANVAS' ||
+                           tagName === 'VIDEO' ||
+                           tagName === 'AUDIO' ||
+                           tagName === 'IFRAME' ||
+                           classList.contains('download-buttons') || 
+                           classList.contains('admin-login') ||
+                           classList.contains('pdf-image-page') ||
+                           element.style.display === 'none' ||
+                           element.style.visibility === 'hidden' ||
+                           element.style.opacity === '0';
                 }
             },
             jsPDF: { 
-                unit: 'mm', 
+                unit: 'pt',  // Points for higher precision than mm
                 format: 'a4', 
                 orientation: 'landscape',
-                compress: true
+                compress: false,  // Disable compression for maximum quality
+                precision: 16,  // Maximum precision
+                userUnit: 1.0,  // Standard user unit
+                hotfixes: ['px_scaling'],  // Enable scaling hotfixes
+                putOnlyUsedFonts: true,  // Optimize font usage
+                floatPrecision: 16  // Maximum float precision
             },
             pagebreak: { 
-                mode: ['avoid-all', 'css'],
+                mode: ['avoid-all', 'css', 'legacy'],
                 before: '.pdf-page',
                 after: '.pdf-page',
-                avoid: '.pdf-worship-item, .pdf-notice-item'
+                avoid: '.pdf-worship-item, .pdf-notice-item, .pdf-financial-table, .pdf-header'
             }
         };
         
-        console.log(`   - Canvas scale: ${opt.html2canvas.scale}`);
+        console.log(`   - Canvas scale: ${opt.html2canvas.scale} (enhanced)`);
         console.log(`   - Canvas size: ${opt.html2canvas.width}x${opt.html2canvas.height}`);
-        console.log(`   - Image timeout: ${opt.html2canvas.imageTimeout}ms`);
+        console.log(`   - Image timeout: ${opt.html2canvas.imageTimeout}ms (disabled)`);
         console.log(`   - PDF format: ${opt.jsPDF.format} ${opt.jsPDF.orientation}`);
+        console.log(`   - Compression: ${opt.jsPDF.compress ? '✅' : '❌'}`);
         
-        // Step 7: Generate PDF with detailed error tracking
-        console.log(`\n🎯 Step 7: Generating PDF...`);
+        // Step 8: Generate PDF with enhanced error tracking
+        console.log(`\n🎯 Step 8: Generating enhanced PDF...`);
         const pdfStartTime = performance.now();
         
         try {
@@ -482,96 +627,137 @@ async function downloadPDF() {
             const pdfTime = Math.round(performance.now() - pdfStartTime);
             const totalTime = Math.round(performance.now() - startTime);
             
-            console.log(`✅ PDF generated successfully!`);
+            console.log(`✅ MAXIMUM QUALITY PDF generated successfully!`);
             console.log(`   - PDF generation time: ${pdfTime}ms`);
             console.log(`   - Total process time: ${totalTime}ms`);
+            console.log(`   - Quality: MAXIMUM (3.0x scale, 300 DPI, PNG format)`);
             
-            alert('PDF가 성공적으로 생성되었습니다!');
+            alert('🏆 최고품질 PDF가 성공적으로 생성되었습니다!\n\n🎯 최고 품질 설정:\n• 3배 해상도 (3.0x scale)\n• 300 DPI 인쇄품질\n• PNG 무손실 포맷\n• 16비트 정밀도\n• 압축 비활성화\n\n📝 완전한 주보 내용 포함\n🎨 최적화된 텍스트 렌더링\n\n💡 이미지는 별도 다운로드를 이용해주세요.');
             
         } catch (pdfError) {
             const pdfTime = Math.round(performance.now() - pdfStartTime);
-            console.error(`❌ Primary PDF generation failed after ${pdfTime}ms:`, pdfError);
-            console.error(`🔍 Error analysis:`);
+            console.error(`❌ Enhanced PDF generation failed after ${pdfTime}ms:`, pdfError);
+            console.error(`🔍 Enhanced error analysis:`);
             console.error(`   - Error name: ${pdfError.name}`);
             console.error(`   - Error message: ${pdfError.message}`);
             console.error(`   - Error stack:`, pdfError.stack);
             
-            // Check for specific error types
+            // Enhanced error classification
+            let errorType = 'Unknown';
             if (pdfError.message.includes('toDataURL')) {
-                console.error(`🎯 Canvas tainting detected - this is the core issue`);
-            }
-            if (pdfError.message.includes('CORS')) {
+                errorType = 'Canvas Tainting';
+                console.error(`🎯 Canvas tainting detected - core issue identified`);
+            } else if (pdfError.message.includes('CORS')) {
+                errorType = 'CORS Policy';
                 console.error(`🎯 CORS issue detected`);
-            }
-            if (pdfError.message.includes('SecurityError')) {
+            } else if (pdfError.message.includes('SecurityError')) {
+                errorType = 'Security Restriction';
                 console.error(`🎯 Security error detected - likely local file access`);
+            } else if (pdfError.message.includes('Network')) {
+                errorType = 'Network Issue';
+                console.error(`🎯 Network error detected`);
             }
             
-            console.log(`\n🔄 Attempting fallback PDF generation without images...`);
+            console.log(`\n🔄 Attempting ultra-safe fallback PDF generation...`);
+            console.log(`   - Error type identified: ${errorType}`);
             
-            // Remove image pages for fallback
+            // Remove all potentially problematic elements
             const imagePages = pdfLayout.querySelectorAll('.pdf-image-page');
-            console.log(`   - Removing ${imagePages.length} image pages for fallback`);
-            imagePages.forEach(page => page.remove());
+            const problematicElements = pdfLayout.querySelectorAll('img, canvas, video, audio, iframe');
             
-            // Simplified options for fallback
-            const fallbackOpt = {
-                margin: [15, 15, 15, 15],
-                filename: '백령감리교회_주보.pdf',
+            console.log(`   - Removing ${imagePages.length} image pages`);
+            console.log(`   - Removing ${problematicElements.length} problematic elements`);
+            
+            imagePages.forEach(page => page.remove());
+            problematicElements.forEach(element => element.remove());
+            
+            // Ultra-safe options for fallback
+            const ultraSafeFallbackOpt = {
+                margin: [12, 12, 12, 12],
+                filename: '백령감리교회_주보_안전판.pdf',
                 image: { 
                     type: 'jpeg', 
-                    quality: 0.8 
+                    quality: 0.7 
                 },
                 html2canvas: { 
-                    scale: 1.2,
+                    scale: 1.0,  // Reduced scale for stability
                     useCORS: false,
                     allowTaint: true,
                     letterRendering: true,
-                    backgroundColor: '#f5f5dc',
-                    logging: true,
+                    backgroundColor: '#ffffff',
+                    logging: false,
+                    foreignObjectRendering: false,
+                    removeContainer: true,
+                    imageTimeout: 0,
+                    onclone: function(clonedDoc) {
+                        // Simplify cloned document
+                        const clonedLayout = clonedDoc.querySelector('.pdf-layout');
+                        if (clonedLayout) {
+                            clonedLayout.style.fontFamily = 'Arial, sans-serif';
+                            clonedLayout.style.background = '#ffffff';
+                            // Remove all complex styling
+                            const allElements = clonedLayout.querySelectorAll('*');
+                            allElements.forEach(el => {
+                                el.style.boxShadow = 'none';
+                                el.style.textShadow = 'none';
+                                el.style.filter = 'none';
+                                el.style.transform = 'none';
+                            });
+                        }
+                    },
                     ignoreElements: function(element) {
                         return element.classList.contains('download-buttons') || 
                                element.classList.contains('admin-login') ||
-                               element.classList.contains('pdf-image-page');
+                               element.classList.contains('pdf-image-page') ||
+                               element.tagName === 'IMG' ||
+                               element.tagName === 'CANVAS';
                     }
                 },
                 jsPDF: { 
                     unit: 'mm', 
                     format: 'a4', 
-                    orientation: 'landscape'
+                    orientation: 'landscape',
+                    compress: false  // Disable compression for stability
                 }
             };
             
-            console.log(`   - Fallback options configured (scale: ${fallbackOpt.html2canvas.scale})`);
+            console.log(`   - Ultra-safe fallback configured (scale: ${ultraSafeFallbackOpt.html2canvas.scale})`);
             
             try {
                 const fallbackStartTime = performance.now();
-                await html2pdf().set(fallbackOpt).from(pdfLayout).save();
+                await html2pdf().set(ultraSafeFallbackOpt).from(pdfLayout).save();
                 
                 const fallbackTime = Math.round(performance.now() - fallbackStartTime);
                 const totalTime = Math.round(performance.now() - startTime);
                 
-                console.log(`✅ Fallback PDF generated successfully!`);
+                console.log(`✅ Ultra-safe fallback PDF generated successfully!`);
                 console.log(`   - Fallback generation time: ${fallbackTime}ms`);
                 console.log(`   - Total process time: ${totalTime}ms`);
+                console.log(`   - Error type handled: ${errorType}`);
                 
-                alert('✅ PDF가 성공적으로 생성되었습니다!\n\n📝 주보 내용이 포함되었습니다.\n🖼️ 이미지는 브라우저 보안 정책으로 인해 제외되었습니다.\n\n💡 이미지가 필요한 경우 "🖼️ 이미지 다운로드" 버튼을 사용해주세요.');
+                alert(`✅ 안전 모드 PDF가 생성되었습니다!\n\n📝 주보 텍스트 내용 포함\n🛡️ 브라우저 호환성 최적화\n⚠️ 원본 오류: ${errorType}\n\n💡 이미지는 별도 다운로드를 이용해주세요.`);
                 
             } catch (fallbackError) {
                 const fallbackTime = Math.round(performance.now() - fallbackStartTime);
-                console.error(`❌ Fallback PDF generation also failed after ${fallbackTime}ms:`, fallbackError);
-                console.error(`🔍 Fallback error analysis:`);
+                console.error(`❌ Ultra-safe fallback also failed after ${fallbackTime}ms:`, fallbackError);
+                console.error(`🔍 Final fallback error analysis:`);
                 console.error(`   - Error name: ${fallbackError.name}`);
                 console.error(`   - Error message: ${fallbackError.message}`);
                 console.error(`   - Error stack:`, fallbackError.stack);
                 
-                alert(`❌ PDF 생성에 실패했습니다.\n\n브라우저 콘솔을 확인해주세요.\n오류: ${fallbackError.message}\n\n💡 다른 브라우저(Chrome 권장)에서 시도해보세요.`);
+                alert(`❌ PDF 생성에 실패했습니다.\n\n🔍 오류 분석:\n- 원본 오류: ${errorType}\n- 최종 오류: ${fallbackError.message}\n\n💡 해결 방법:\n1. Chrome 브라우저 사용\n2. HTTPS 서버에서 실행\n3. 브라우저 콘솔 확인\n4. Word 문서 다운로드 시도`);
             }
+        }
+        
+        // Clean up CSS fixes
+        const styleElement = document.getElementById('pdf-compatibility-fixes');
+        if (styleElement) {
+            styleElement.remove();
         }
         
     } catch (error) {
         const totalTime = Math.round(performance.now() - startTime);
-        console.error(`❌ Error during PDF generation setup after ${totalTime}ms:`, error);
+        console.error(`❌ Error during enhanced PDF generation setup after ${totalTime}ms:`, error);
         console.error(`🔍 Setup error analysis:`);
         console.error(`   - Error name: ${error.name}`);
         console.error(`   - Error message: ${error.message}`);
@@ -584,8 +770,8 @@ async function downloadPDF() {
         restoreOriginalLayout(regularContent, pdfLayout, buttons, adminLogin);
         
         const totalTime = Math.round(performance.now() - startTime);
-        console.log(`📊 PDF Generation Process Complete - Total time: ${totalTime}ms`);
-        console.log(`============================\n`);
+        console.log(`📊 Enhanced PDF Generation Process Complete - Total time: ${totalTime}ms`);
+        console.log(`====================================\n`);
     }
 }
 
