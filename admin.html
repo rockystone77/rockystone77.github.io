@@ -501,17 +501,64 @@
 
         // 페이지 로드 시 초기화
         document.addEventListener('DOMContentLoaded', function() {
+            loadSavedData();
             loadWorshipItems();
             loadFinancialItems();
             loadNewsItems();
         });
+
+        // 저장된 데이터 로드 함수
+        function loadSavedData() {
+            const savedData = localStorage.getItem('bulletinData');
+            if (!savedData) return;
+            
+            const data = JSON.parse(savedData);
+            
+            // 기본 정보 로드
+            if (data.churchName) document.getElementById('churchName').value = data.churchName;
+            if (data.churchSubtitle) document.getElementById('churchSubtitle').value = data.churchSubtitle;
+            if (data.volume) document.getElementById('volume').value = data.volume;
+            if (data.date) document.getElementById('date').value = data.date;
+            if (data.pastor) document.getElementById('pastor').value = data.pastor;
+            
+            // 예배 정보 로드
+            if (data.worshipTime) document.getElementById('worshipTime').value = data.worshipTime;
+            if (data.worshipLeader) document.getElementById('worshipLeader').value = data.worshipLeader;
+            if (data.scripture) document.getElementById('scripture').value = data.scripture;
+            if (data.sermon) document.getElementById('sermon').value = data.sermon;
+            
+            // 헌금 정보 로드
+            if (data.financialMonth) document.getElementById('financialMonth').value = data.financialMonth;
+            if (data.bankAccount) document.getElementById('bankAccount').value = data.bankAccount;
+            
+            // 연락처 정보 로드
+            if (data.address) document.getElementById('address').value = data.address;
+            if (data.phone) document.getElementById('phone').value = data.phone;
+            if (data.mobile) document.getElementById('mobile').value = data.mobile;
+            if (data.established) document.getElementById('established').value = data.established;
+            
+            // 동적 항목들은 각각의 로드 함수에서 처리
+            if (data.worshipItems) {
+                // 기존 초기 데이터 대신 저장된 데이터 사용
+                window.savedWorshipItems = data.worshipItems;
+            }
+            if (data.financialItems) {
+                window.savedFinancialItems = data.financialItems;
+            }
+            if (data.newsItems) {
+                window.savedNewsItems = data.newsItems;
+            }
+        }
 
         // 예배 순서 로드
         function loadWorshipItems() {
             const container = document.getElementById('worshipItems');
             container.innerHTML = '';
             
-            initialWorshipItems.forEach((item, index) => {
+            // 저장된 데이터가 있으면 사용, 없으면 초기 데이터 사용
+            const itemsToLoad = window.savedWorshipItems || initialWorshipItems;
+            
+            itemsToLoad.forEach((item, index) => {
                 addWorshipItemWithData(item, index);
             });
         }
@@ -555,7 +602,10 @@
             const container = document.getElementById('financialItems');
             container.innerHTML = '';
             
-            initialFinancialItems.forEach((item, index) => {
+            // 저장된 데이터가 있으면 사용, 없으면 초기 데이터 사용
+            const itemsToLoad = window.savedFinancialItems || initialFinancialItems;
+            
+            itemsToLoad.forEach((item, index) => {
                 addFinancialItemWithData(item, index);
             });
         }
@@ -597,7 +647,10 @@
             const container = document.getElementById('newsItems');
             container.innerHTML = '';
             
-            initialNewsItems.forEach((item, index) => {
+            // 저장된 데이터가 있으면 사용, 없으면 초기 데이터 사용
+            const itemsToLoad = window.savedNewsItems || initialNewsItems;
+            
+            itemsToLoad.forEach((item, index) => {
                 addNewsItemWithData(item, index);
             });
         }

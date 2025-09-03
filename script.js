@@ -30,14 +30,7 @@ function loadBulletinData() {
         }
     }
     
-    if (data.sermon) {
-        const sermonElement = document.querySelector('.worship-item:nth-child(12) span:first-child .highlight');
-        if (sermonElement) {
-            sermonElement.textContent = data.sermon;
-        }
-    }
-    
-    // Update worship items
+    // Update worship items (this will handle sermon updates too)
     if (data.worshipItems && data.worshipItems.length > 0) {
         const worshipContainer = document.querySelector('.worship-order');
         const existingItems = worshipContainer.querySelectorAll('.worship-item');
@@ -50,9 +43,14 @@ function loadBulletinData() {
             const div = document.createElement('div');
             div.className = item.standing ? 'worship-item standing' : 'worship-item';
             
-            const itemText = item.item.includes(data.sermon) ? 
-                item.item.replace(data.sermon, `<span class="highlight">${data.sermon}</span>`) : 
-                item.item;
+            // Check if this item contains the sermon and highlight it
+            let itemText = item.item;
+            if (data.sermon && item.item.includes('설교') && item.item.includes(data.sermon)) {
+                itemText = item.item.replace(data.sermon, `<span class="highlight">${data.sermon}</span>`);
+            } else if (data.sermon && item.item.includes('설교') && !item.item.includes(data.sermon)) {
+                // Replace any existing sermon title with the new one
+                itemText = item.item.replace(/설교 - .+/, `설교 - <span class="highlight">${data.sermon}</span>`);
+            }
             
             div.innerHTML = `
                 <span>${itemText}</span>
@@ -837,6 +835,12 @@ async function downloadImage() {
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, checking for saved data...');
+    const savedData = localStorage.getItem('bulletinData');
+    console.log('Saved data found:', savedData ? 'Yes' : 'No');
+    if (savedData) {
+        console.log('Saved data content:', JSON.parse(savedData));
+    }
     loadBulletinData();
     setupLoginEventListeners();
 });
